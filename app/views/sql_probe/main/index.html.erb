@@ -1,0 +1,7 @@
+<%= flash.to_h %>
+
+<%= button_to "Start", start_path, disabled: SqlProbe.listening? %>
+<%= button_to "Stop", stop_path, disabled: !SqlProbe.listening? %>
+<%= button_to "Reset", reset_path %>
+
+Hello
