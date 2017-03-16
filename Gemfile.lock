@@ -167,6 +167,7 @@ PLATFORMS
 DEPENDENCIES
   guard
   guard-rspec
+  pry
   rspec-rails (~> 3.5.0)
   sql_probe!
   sqlite3

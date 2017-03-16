@@ -19,5 +19,6 @@ group :development, :test do
   gem 'guard', require: false
   gem 'guard-rspec', require: false
   gem 'rspec-rails', '~> 3.5.0'
+  gem 'pry'
 end
 
