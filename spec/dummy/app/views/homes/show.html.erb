@@ -3,6 +3,11 @@
 <p>
   <strong>Address:</strong>
   <%= @home.address %>
+
+  <h2>Windows</h2>
+  <% @home.windows.each do |window| %>
+    <pre><%= JSON.pretty_generate(window) %></pre>
+  <% end %>
 </p>
 
 <%= link_to 'Edit', edit_home_path(@home) %> |

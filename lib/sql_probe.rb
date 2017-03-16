@@ -25,4 +25,10 @@ module SqlProbe
   def self.clear_output_dir
     FileUtils.rm_rf(output_base_dir)
   end
+
+  def self.generate_stats
+    {
+
+    }
+  end
 end

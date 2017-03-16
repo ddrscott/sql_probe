@@ -30,6 +30,7 @@ module SqlProbe
     def write_to_file_system(events:, output_base_path: )
       # ignore all Rails introspection noise
       events.reject!{|e| e.payload[:name] == 'SCHEMA'}
+      return if events.empty?
 
       # reformat event to be more "readable"
       events.map!{|e| flatten_event_payload(e) }

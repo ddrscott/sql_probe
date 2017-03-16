@@ -6,6 +6,30 @@ module SqlProbe
       @sql = sql
     end
 
+    def action
+      if insert?
+        'INSERT'
+      elsif update?
+        'UPDATE'
+      elsif delete?
+        'DELETE'
+      else
+        'SELECT'
+      end
+    end
+
+    def action_tables
+      if insert?
+        [insert_table]
+      elsif update?
+        [update_table]
+      elsif delete?
+        [delete_table]
+      else
+        data_sources
+      end
+    end
+
     def insert?
       insert_table.present?
     end
@@ -31,13 +55,13 @@ module SqlProbe
     end
 
     def update_table
-      # ex: update foo, baz set 
+      # ex: update foo, baz set
       clean_sql[/\bUPDATE\s+(.+?)\s+(SET|,)/im, 1]
     end
 
     def data_sources
       parts = clean_sql.split(/\W+/)
-      parts & self.all_data_sources
+      parts & SqlProbe::Inspector.all_data_sources
     end
 
     def self.all_data_sources
