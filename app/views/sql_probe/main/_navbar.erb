@@ -34,7 +34,7 @@
             Clear SQL Data &hellip; <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><%= link_to "Delete all SQLs from: #{SqlProbe.output_base_dir}", reset_path %></li>
+            <li><%= button_to "Delete all SQLs from: #{SqlProbe.output_base_dir}", reset_path, class: 'btn btn-small btn-danger' %></li>
           </ul>
         </li>
       </ul>
