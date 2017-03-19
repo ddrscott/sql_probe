@@ -8,13 +8,13 @@ module SqlProbe
 
     def action
       if insert?
-        'INSERT'
+        :insert
       elsif update?
-        'UPDATE'
+        :update
       elsif delete?
-        'DELETE'
+        :delete
       else
-        'SELECT'
+        :select
       end
     end
 
