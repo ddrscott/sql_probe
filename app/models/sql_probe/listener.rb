@@ -26,7 +26,6 @@ module SqlProbe
       end
     end
 
-
     def write_to_file_system(events:, output_base_path: )
       # ignore all Rails introspection noise
       events.reject!{|e| e.payload[:name] == 'SCHEMA'}
@@ -42,8 +41,10 @@ module SqlProbe
 
       # write contents
       File.open(full_path, 'w') do |f|
+        params = request.params
         f << {
-          'params' => request.params,
+          'name' => "#{params[:controller]}##{params[:action]}",
+          'params' => params,
           'events' => events
         }.to_yaml
       end

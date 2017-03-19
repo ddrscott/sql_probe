@@ -1,76 +1,87 @@
-load '/Users/ricardo.fleury/repos/sql_probe/lib/sql_probe/inspector.rb' if Rails.env.development?
 module SqlProbe
+  # Manage the dashboard
   class MainController < ApplicationController
     def index
-      # @stats = SqlProbe.generate_stats
-      @stats = Dir["#{SqlProbe.output_base_dir}/**/*.yml"].map do |path|
-        parse_stats_file(path)
-      end
-
-      @stats.sort_by!{|s| s[:file_ts]}
-
-      @tables = {}
-
-      @stats.each do |event|
-        event[:stats].each do |stat|
-          stat[:tables].each do |table|
-            @tables[table] ||= 0
-            @tables[table] += 1
-          end
-        end
-      end
-    end
-
-    def parse_stats_file(path)
-      data = YAML.load(File.read(path))
-
-      sql_stats = data['events']
-        .map{ |m| parse_sql(m['sql']) }
-        .compact
-
-      {
-         path: path,
-         file_ts: File.mtime(path),
-         controller: data['params']['controller'],
-         action: data['params']['action'],
-         stats: sql_stats
-      }
-    end
-
-    def parse_sql(sql)
-      ins = Inspector.new(sql)
-      tables = ins.action_tables
-      if tables.any?
-        {
-          sql_action: ins.action,
-          tables: tables
-        }
-      end
+      @events = filter_events(StatementList.new.to_a, params_sql_filter)
+      @totals = rollup_counts(@events)
+      @pivot = pivot_counts(@events, @totals)
+               .sort_by { |row| File.mtime(row[:path]) }
+               .reverse
     end
 
     def start
       if SqlProbe.listening?
-        flash[:success] = "Already listening"
+        flash[:success] = 'Already listening'
       else
         SqlProbe.listening = true
-        flash[:success] = "Listening enabled"
+        flash[:success] = 'Listening enabled'
       end
-      redirect_to :root
+      redirect_to :back
     end
 
     def stop
       if SqlProbe.listening?
-        flash[:success] = "Listening disabled"
+        flash[:success] = 'Listening disabled'
         SqlProbe.listening = false
       else
-        flash[:success] = "Listening already disabled"
+        flash[:success] = 'Listening already disabled'
       end
-      redirect_to :root
+      redirect_to :back
     end
 
     def reset
       SqlProbe.clear_output_dir
-      redirect_to :root
+      redirect_to :back
+    end
+
+    private
+
+    def params_sql_filter
+      params[:sql_filter].try(:split, ',').try(:map, &:to_sym)
+    end
+
+    def filter_events(events, sql_filter)
+      return events unless sql_filter
+      events.select do |event|
+        event[:tables].detect do |_, action|
+          sql_filter.include?(action)
+        end
+      end
+    end
+
+    # Expands the events row with columns from totals.
+    def pivot_counts(events, totals)
+      events
+        .group_by { |g| [g[:name], g[:path]] }
+        .map do |(name, path), events|
+          row = {
+            name: name,
+            path: path
+          }
+          totals.each_with_object(row) do |(table, _), agg|
+            agg[table] = events
+                         .reduce(0) { |acc, elem| elem[:tables][table] ? acc + 1 : acc }
+          end
+        end
+    end
+
+    # Count up totals of all events by table name and action type.
+    # @return [Hash<String, Hash<String,Integer>>] Table => Action => Count
+    def rollup_counts(events)
+      # Totals by table and action to Hash['table']['action']=0
+      counts = Hash.new do |h, k|
+        h[k] = Hash.new do |h2, k2|
+          h2[k2] = 0
+        end
+      end
+
+      events.each do |event|
+        event[:tables].each do |table, action|
+          counts[table][action] += 1
+        end
+      end
+
+      counts.sort_by { |k, _| k }
     end
   end
 end

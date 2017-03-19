@@ -4,8 +4,6 @@
   </div>
 <% end %>
 
-<h1>Sql Probe</h1>
-
 <div>
   <div class='pull-right'>
     <div class='col-xs-6'>
@@ -22,35 +20,5 @@
   </div>
 </div>
 
-
-<h2>Queries</h2>
-<table class="table table-striped table-hover">
-  <tr>
-     <th>Controller</th>
-     <th>Action</th>
-     <th>Time</th>
-     <% @tables.each do |name, count| %>
-       <th><%= name %> (<%= count %>)</th>
-     <% end %>
-  </tr>
-
-  <% @stats.each do |event| %>
-  <tr>
-    <td><%= event[:controller] %></td>
-    <td><%= event[:action] %></td>
-    <td><%= event[:file_ts] %></td>
-    <% @tables.each do |name, _| %>
-      <td>
-        <%= event[:stats].reduce(0){ |acc, s|
-          acc + s[:tables].select{|t| t == name}.size
-         } %>
-      </td>
-    <% end %>
-  </tr>
-  <% end %>
-</table>
-
-<hr>
-
-<h2>Raw Data</h2>
-<pre><%= JSON.pretty_generate(@stats) %></pre>
+<h2>Query Summary</h2>
+<%= render 'pivot', pivot: @pivot if @pivot.any? %>

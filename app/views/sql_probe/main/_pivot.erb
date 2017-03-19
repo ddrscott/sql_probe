@@ -1,0 +1,44 @@
+<% pivot ||= raise ArgumentError, '`pivot` is a required partial argument!' %>
+<% headers = pivot.first.try(:keys) %>
+<% content_for :head do %>
+<style>
+  th.rotate {
+    height: 87px;
+    white-space: nowrap;
+  } 
+  th.rotate > div {
+    transform: 
+      translate(21px, 52px)
+      rotate(315deg);
+    width: 29px;
+  }
+  th.rotate > div > span {
+    border-bottom: 1px solid #ccc;
+    padding: 5px 1px;
+  }
+  th.clear, tr.clear {
+    border: none !important;
+    background: none !important;
+  }
+  td-pivot {
+    width: 27px;
+  }
+</style>
+<% end %>
+<table class="table table-bordered table-striped table-condensed" style="border:none">
+  <tr class='clear'>
+    <th class='clear'></th>
+    <% headers[2..-1].each do |header| %>
+      <th class='rotate clear'><div><span><%= header %></span></div></th>
+    <% end %>
+  </tr>
+
+  <% pivot.each do |event| %>
+    <tr>
+      <td><%= link_to(event[:name], '#') %></td>
+      <% event.values[2..-1].each do |count| %>
+        <td class="text-center td-pivot"><%= count > 0 ? count : nil %></td>
+      <% end %>
+    </tr>
+  <% end %>
+</table>
