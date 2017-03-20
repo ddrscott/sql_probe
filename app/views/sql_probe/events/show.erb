@@ -1,16 +1,25 @@
 <% content_for :head do %>
 <style>
-#caller-code {
-  border-top: 2px solid grey;
+#caller-resizable {
+  border-top: 3px solid lightgrey;
   width: 100%;
-  height: 30em;
+  height: 20em;
   position: fixed;
   bottom: 0;
+  left: 0;
+  right: 0;
+}
+#caller-code {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: 0;
 }
 </style>
 <% end %>
 
-<div class="panel panel-default" style="margin-bottom: 30em">
+<div class="panel panel-default sync-margin" style="margin-bottom: 20em">
   <div class="panel-heading">
     <h3 class="panel-title"><%= @event['name'] %></h3>
   </div>
@@ -31,12 +40,13 @@
   </table>
 </div>
 
+<div id="caller-resizable">
+  <div id="caller-code"></div>
+</div>
+
 <% content_for :javascript do %>
 <script>
 $(document).ready(function() {
-  // add editor div
-  var callerCode = $('<div id="caller-code"></div>');
-  $('body').append(callerCode);
 
   // configure editor
   var editor = ace.edit("caller-code");
@@ -54,7 +64,6 @@ $(document).ready(function() {
     $.ajax({
       url: $this.attr("href"),
       success: function (data) {
-        var editor = ace.edit("caller-code");
         editor.setValue(data.code);
         editor.gotoLine(data.line, 0, true);
       },
@@ -63,6 +72,20 @@ $(document).ready(function() {
       }
     });
   })
+
+  var handleResize = function() {
+    editor.resize();
+    resizable.css('bottom', 0);
+    $('.sync-margin').css('margin-bottom',resizable.height() + 24);
+  };
+
+  var resizable = $('#caller-resizable');
+  resizable.resizable({
+    handles: 'n',
+    resize: handleResize
+  });
+
+  $(window).on('resize', handleResize);
 });
 </script>
 <% end %>
