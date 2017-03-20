@@ -14,31 +14,31 @@
 //
 
 $(document).ready(function() {
+  // add editor div
   var callerCode = $('<div id="caller-code"></div>');
   $('body').append(callerCode);
+
+  // configure editor
   var editor = ace.edit("caller-code");
   editor.getSession().setMode("ace/mode/ruby");
   editor.setReadOnly(true);
 
+  // Override default click behavior to make ajax
+  // request to get the source code from the locator
+  // and set the value of the editor to the response.
+  // Then jump to the line in the response.
   $('.caller-link').on('click', function (e) {
     var $this = $(this);
     e.preventDefault();
 
     $.ajax({
       url: $this.attr("href"),
-      //async: false,
       success: function (data) {
-        console.log('data: ', data);
-        var editor = ace.edit("caller-code");
         editor.setValue(data.code);
         editor.gotoLine(data.line, 0, true);
-        //editor.scrollToLine(data.line, true);
-
-				//editor.setTheme("ace/theme/monokai");
-				//editor.getSession().setMode("ace/mode/javascript");
       },
-      error: function () {
-        e.preventDefault();
+      error: function (data) {
+        console.error('could not get source. data: ', data);
       }
     });
   })
