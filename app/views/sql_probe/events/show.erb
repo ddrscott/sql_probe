@@ -66,12 +66,28 @@ $(document).ready(function() {
       success: function (data) {
         editor.setValue(data.code);
         editor.gotoLine(data.line, 0, true);
+
+        // keep focus on original clicked thing
+        $(e.target).focus();
       },
       error: function (data) {
         console.error('could not get source. data: ', data);
       }
     });
-  })
+  });
+
+  // setup hotkeys to jump between stack lines
+  $('.caller-link').keypress(function(e){
+    var jumpTo = null;
+    if ( event.key === 'j' ) {
+      jumpTo = $(e.target).nextAll('.caller-link')[0];
+    } else if (event.key === 'k') {
+      jumpTo = $(e.target).prevAll('.caller-link')[0];
+    }
+    if (jumpTo) {
+      jumpTo.click();
+    }
+  });
 
   var handleResize = function() {
     editor.resize();
