@@ -1,5 +1,18 @@
+<% content_for :head do %>
+<style>
+#caller-code {
+  border-top: 2px solid grey;
+  width: 100%;
+  height: 30em;
+  position: fixed;
+  left: 0;
+  right; 0;
+  bottom: 0;
+}
+</style>
+<% end %>
 
-<div class="panel panel-default">
+<div class="panel panel-default" style="margin-bottom: 30em">
   <div class="panel-heading">
     <h3 class="panel-title"><%= @event['name'] %></h3>
   </div>
@@ -14,7 +27,7 @@
   <% @event['events'].each do |event| %>
     <tr >
       <td class="td-pre"><%= SqlProbe::Utils.pretty_sql(event['sql'])%></td>
-      <td class="td-pre"><%= pretty_caller(event['caller']) %></td>
+      <td class="td-pre"><%= caller_links(event['caller']) %></td>
     </tr>
   <% end %>
   </table>

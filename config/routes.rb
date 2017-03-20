@@ -6,4 +6,5 @@ SqlProbe::Engine.routes.draw do
   post 'reset', to: 'main#reset'
 
   get 'event', to: 'events#show'
+  get 'event/code', to: 'events#code'
 end
