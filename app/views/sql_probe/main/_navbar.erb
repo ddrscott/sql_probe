@@ -26,7 +26,7 @@
           <% if SqlProbe.listening? %>
             <%= button_to "Stop listening", stop_path, disabled: !SqlProbe.listening?, class: 'btn btn-default' %>
           <% else %>
-            <%= button_to "Start listening", start_path, disabled: SqlProbe.listening?, class: 'btn btn-default' %>
+            <%= button_to "Start listening", start_path, disabled: SqlProbe.listening?, class: 'btn btn-default btn-primary' %>
           <% end %>
         </li>
         <li class="dropdown">

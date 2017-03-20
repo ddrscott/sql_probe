@@ -20,12 +20,12 @@
     border: none !important;
     background: none !important;
   }
-  td-pivot {
+  .td-pivot {
     width: 27px;
   }
 </style>
 <% end %>
-<table class="table table-bordered table-striped table-condensed" style="border:none">
+<table class="table table-bordered table-striped table-condensed" style="border:none; width: inherit">
   <tr class='clear'>
     <th class='clear'></th>
     <% headers[2..-1].each do |header| %>
@@ -35,7 +35,7 @@
 
   <% pivot.each do |event| %>
     <tr>
-      <td><%= link_to(event[:name], '#') %></td>
+      <td><%= link_to(event[:name], event_path(path: event[:path])) %></td>
       <% event.values[2..-1].each do |count| %>
         <td class="text-center td-pivot"><%= count > 0 ? count : nil %></td>
       <% end %>

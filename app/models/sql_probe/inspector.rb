@@ -70,12 +70,8 @@ module SqlProbe
 
     private
 
-    def remove_redundant_quotes(sql)
-      sql.gsub(/(")([\S]+?)\1/, '\2')
-    end
-
     def clean_sql
-      @clean_sql ||= remove_redundant_quotes(@sql)
+      @clean_sql ||= SqlProbe::Utils.remove_redundant_sql_quotes(@sql)
     end
   end
 end

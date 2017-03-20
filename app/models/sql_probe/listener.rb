@@ -6,13 +6,16 @@ module SqlProbe
       around_action :sql_probe_listen
     end
 
+    #
     # Opens a listener for SQL notifications to gather event information
     # @return [Array<ActiveSupport::Notifications::Event>]
     def sql_probe_listen(&block)
       if SqlProbe.listening?
         events = []
         subscription_name = ActiveSupport::Notifications.subscribe('sql.active_record') do |*args|
-          events << ActiveSupport::Notifications::Event.new(*args)
+          event = EventWithCaller.new(*args)
+          event.caller = caller
+          events << event
         end
         begin
           block.call
@@ -26,7 +29,7 @@ module SqlProbe
       end
     end
 
-    def write_to_file_system(events:, output_base_path: )
+    def write_to_file_system(events:, output_base_path:)
       # ignore all Rails introspection noise
       events.reject!{|e| e.payload[:name] == 'SCHEMA'}
       return if events.empty?

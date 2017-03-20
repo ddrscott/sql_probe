@@ -9,6 +9,10 @@ module SqlProbe
                .reverse
     end
 
+    def show
+      @event = YAML.load_file(params[:path])
+    end
+
     def start
       if SqlProbe.listening?
         flash[:success] = 'Already listening'
