@@ -16,6 +16,10 @@
   right: 0;
   top: 0;
 }
+
+a.caller-link:focus {
+  background: yellow;
+}
 </style>
 <% end %>
 
@@ -53,27 +57,34 @@ $(document).ready(function() {
   editor.getSession().setMode("ace/mode/ruby");
   editor.setReadOnly(true);
 
-  // Override default click behavior to make ajax
-  // request to get the source code from the locator
-  // and set the value of the editor to the response.
-  // Then jump to the line in the response.
-  $('.caller-link').on('click', function (e) {
-    var $this = $(this);
-    e.preventDefault();
-
+  var loadSource = function(link) {
+    var $link = $(link);
     $.ajax({
-      url: $this.attr("href"),
+      url: $link.attr("href"),
       success: function (data) {
         editor.setValue(data.code);
-        editor.gotoLine(data.line, 0, true);
+
+        // resize() is required to fix a bug.
+        // @see http://stackoverflow.com/a/23748891/613772
+        editor.resize(true);
+        editor.gotoLine(data.line);
 
         // keep focus on original clicked thing
-        $(e.target).focus();
+        $($link).focus();
       },
       error: function (data) {
         console.error('could not get source. data: ', data);
       }
     });
+  };
+
+  // Override default click behavior to make ajax
+  // request to get the source code from the locator
+  // and set the value of the editor to the response.
+  // Then jump to the line in the response.
+  $('.caller-link').on('click', function (e) {
+    e.preventDefault();
+    loadSource(e.target);
   });
 
   // setup hotkeys to jump between stack lines
@@ -89,6 +100,7 @@ $(document).ready(function() {
     }
   });
 
+  // Setup drag bar
   var handleResize = function() {
     editor.resize();
     resizable.css('bottom', 0);
@@ -96,11 +108,11 @@ $(document).ready(function() {
   };
 
   var resizable = $('#caller-resizable');
+
   resizable.resizable({
     handles: 'n',
     resize: handleResize
   });
-
   $(window).on('resize', handleResize);
 });
 </script>
