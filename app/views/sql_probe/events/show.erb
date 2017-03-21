@@ -23,6 +23,12 @@
 a.caller-link:focus {
   background: yellow;
 }
+
+.duplicate {
+  font-size: 1em; 
+  font-weight: bold;
+  color: red;
+}
 </style>
 <% end %>
 
@@ -38,9 +44,12 @@ a.caller-link:focus {
     <th>SQL</th>
     <th>Caller</th>
   </tr>
+  <% last_sql   = nil %>
   <% @event['events'].each do |event| %>
     <tr >
-      <td class="td-pre"><%= SqlProbe::Utils.pretty_sql(event['sql'])%></td>
+      <td class="td-pre"><% if event['duplicates'] > 1
+        -%><div class="duplicate pull-right"><%= event['duplicates'] %> calls!</div><% end -%><%= SqlProbe::Utils.pretty_sql(event['sql']) -%>
+      </td>
       <td class="td-pre"><%= caller_links(event['caller']) %></td>
     </tr>
   <% end %>

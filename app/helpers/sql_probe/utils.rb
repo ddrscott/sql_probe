@@ -14,5 +14,19 @@ module SqlProbe
     def remove_redundant_sql_quotes(sql)
       sql.gsub(/(")([\S]+?)\1/, '\2')
     end
+
+    REPLACEMENT_PATTERNS = [
+      UUID_PATTERN = '[0-9a-f]{8}(\\\-[0-9a-f]{4}){3}\\\-[0-9a-f]{12}',
+      OBJECT_IDS   = '0x[0-9a-f]+',
+      GENERAL_IDS  = '\d{5,}'
+    ]
+
+    def replace_varying_ids(sql)
+      line = Regexp.escape(sql)
+      REPLACEMENT_PATTERNS.each do |pattern|
+        line.gsub!(/#{pattern}/, pattern)
+      end
+      line
+    end
   end
 end

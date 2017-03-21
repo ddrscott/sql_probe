@@ -3,6 +3,11 @@ module SqlProbe
   class EventsController < ApplicationController
     def show
       @event = YAML.load_file(params[:path])
+      # remove duplicates based on exact caller backtraces.
+      # add a 'duplicates' count in place of the removed items.
+      @event['events'] = @event['events']
+        .group_by { |g| g['caller'] }
+        .map { |_, items| items.first.tap {|t| t['duplicates'] = items.size }}
     end
 
     def code
