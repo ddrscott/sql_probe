@@ -3,11 +3,10 @@ module SqlProbe
   class EventsController < ApplicationController
     def show
       @event = YAML.load_file(params[:path])
-      # remove duplicates based on exact caller backtraces.
-      # add a 'duplicates' count in place of the removed items.
-      @event['events'] = @event['events']
-        .group_by { |g| g['caller'] }
-        .map { |_, items| items.first.tap {|t| t['duplicates'] = items.size }}
+
+      merge_with_index!(@event['events'])
+
+      @event['events'] = consolidate_events_by_caller(@event['events'])
     end
 
     def code
@@ -18,6 +17,22 @@ module SqlProbe
       else
         render text: '`locator` format must be: `.*:\d+):`', status: 400
       end
+    end
+
+    private
+
+    def merge_with_index!(events)
+      events.each_with_index do |event, i|
+        event['index'] = i
+      end
+    end
+
+    # remove duplicates based on exact caller backtraces.
+    # add a 'duplicates' count in place of the removed items.
+    def consolidate_events_by_caller(events)
+      events
+        .group_by { |g| g['caller'] }
+        .map { |_, items| items.first.tap {|t| t['count'] = items.size }}
     end
   end
 end

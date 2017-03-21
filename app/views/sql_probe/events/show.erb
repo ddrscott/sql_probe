@@ -38,22 +38,39 @@ a.caller-link:focus {
     <h3 class="panel-title"><%= @event['name'] %></h3>
   </div>
   <div class="panel-body">
-    <div class="text-pre"><%= JSON.pretty_generate @event['params'] %></div>
+    <div class="text-pre"><%= JSON.pretty_generate @event.except('name', 'events') %></div>
   </div>
-  <table class="table table-striped table-bordered">
-  <tr>
-    <th>SQL</th>
-    <th>Caller</th>
-  </tr>
-  <% last_sql   = nil %>
-  <% @event['events'].each do |event| %>
-    <tr >
-      <td class="td-pre"><% if event['duplicates'] > 1
-        -%><div class="duplicate pull-right"><%= '█' * event['duplicates'] %>&nbsp;x<%= event['duplicates'] %></div><% end -%><%= SqlProbe::Utils.pretty_sql(event['sql']) -%>
-      </td>
-      <td class="td-pre"><%= caller_links(event['caller']) %></td>
+
+  <table class="table">
+    <tr>
+      <th>SQL Statements by Frequency</th>
+      <th>Callers</th>
     </tr>
-  <% end %>
+    <% @event['events'].sort_by{|e| -e['count'] }.each do |event| %>
+      <tr>
+        <td><%= link_to(event['sql'].truncate(200), "##{event['index']}") %></td>
+        <td class="text-right"><%= event['count'] %></td>
+      </tr>
+    <% end %>
+  </table>
+
+  <table class="table table-striped table-bordered">
+    <tr>
+      <th>SQL Statements Chronological Order</th>
+      <th>Call Stack</th>
+    </tr>
+    <% last_sql   = nil %>
+    <% @event['events'].each do |event| %>
+      <tr>
+        <td class="td-scroll" id="<%= event['index'] %>">
+          <% if (dups = event['count'] - 1) > 1 %>
+            <%= ghetto_bar(event['count'], class: 'duplicate pull-right') %>
+          <% end %>
+          <div class="clearfix text-pre"><%= SqlProbe::Utils.pretty_sql(event['sql']) -%></div>
+        </td>
+        <td class="text-pre td-scroll"><%= caller_links(event['caller']) %></td>
+      </tr>
+    <% end %>
   </table>
 </div>
 

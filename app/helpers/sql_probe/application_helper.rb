@@ -17,5 +17,9 @@ module SqlProbe
         .join("<br/>")
         .html_safe
     end
+
+    def ghetto_bar(size, *attrs)
+      content_tag(:div, "#{'█' * size}&nbsp;#{size}".html_safe, *attrs)
+    end
   end
 end
