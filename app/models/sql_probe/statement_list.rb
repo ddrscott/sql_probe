@@ -12,7 +12,9 @@ module SqlProbe
     def each
       each_yaml do |path, yaml|
         yaml['events'].each do |event|
-          yield event_row(path, yaml, event)
+          row = event_row(path, yaml, event)
+          row[:queries] = yaml['events'].size
+          yield row
         end
       end
     end
