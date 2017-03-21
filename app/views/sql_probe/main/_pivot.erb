@@ -36,7 +36,8 @@
   <% pivot.each do |event| %>
     <tr>
       <td><%= link_to(event[:name], event_path(path: event[:path])) %></td>
-      <% event.values[2..-1].each do |count| %>
+      <th class="text-right td-pivot"><%= event['Total Queries'] %></th>
+      <% event.values[3..-1].each do |count| %>
         <td class="text-center td-pivot"><%= count > 0 ? count : nil %></td>
       <% end %>
     </tr>
