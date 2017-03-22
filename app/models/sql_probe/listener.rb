@@ -14,6 +14,7 @@ module SqlProbe
         events = []
         subscription_name = ActiveSupport::Notifications.subscribe('sql.active_record') do |*args|
           event = EventWithCaller.new(*args)
+          event.duration  # force duration calculation
           event.caller = caller
           events << event
         end

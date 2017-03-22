@@ -44,12 +44,16 @@ a.caller-link:focus {
   <table class="table">
     <tr>
       <th>SQL Statements by Frequency</th>
-      <th>Callers</th>
+      <th class="text-right">Callers</th>
+      <th class="text-right">Total Seconds</th>
+      <th class="text-right">Avg Seconds</th>
     </tr>
     <% @event['events'].sort_by{|e| -e['count'] }.each do |event| %>
       <tr>
         <td><%= link_to(event['sql'].truncate(200), "##{event['index']}") %></td>
         <td class="text-right"><%= event['count'] %></td>
+        <td class="text-right"><%= event['seconds'].round(1) %></td>
+        <td class="text-right"><%= event['avg_seconds'].round(1) %></td>
       </tr>
     <% end %>
   </table>
@@ -63,10 +67,13 @@ a.caller-link:focus {
     <% @event['events'].each do |event| %>
       <tr>
         <td class="td-scroll" id="<%= event['index'] %>">
+          <% clearfix = nil %>
           <% if (dups = event['count'] - 1) > 1 %>
+            <% clearfix = 'clearfix' %>
             <%= ghetto_bar(event['count'], class: 'duplicate pull-right') %>
           <% end %>
-          <div class="clearfix text-pre"><%= SqlProbe::Utils.pretty_sql(event['sql']) -%></div>
+          <div class="<%= clearfix %> text-pre">-- duration: <%= event['duration'].round(1) %>s
+<%= SqlProbe::Utils.pretty_sql(event['sql']) -%></div>
         </td>
         <td class="text-pre td-scroll"><%= caller_links(event['caller']) %></td>
       </tr>

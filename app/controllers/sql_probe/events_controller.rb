@@ -32,7 +32,13 @@ module SqlProbe
     def consolidate_events_by_caller(events)
       events
         .group_by { |g| g['caller'] }
-        .map { |_, items| items.first.tap {|t| t['count'] = items.size }}
+        .map do |_, items|
+        items.first.tap do |t|
+          t['count'] = items.size
+          t['seconds'] = items.reduce(0) { |acc, elem| acc + elem['duration'] }
+          t['avg_seconds'] = t['seconds'] / items.size.to_f
+        end
+      end
     end
   end
 end
