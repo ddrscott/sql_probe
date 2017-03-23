@@ -5,12 +5,8 @@ module SqlProbe
       @events = filter_events(StatementList.new.to_a, params_sql_filter)
       @totals = rollup_counts(@events)
       @pivot = pivot_counts(@events, @totals)
-               .sort_by { |row| File.mtime(row[:path]) }
+               .sort_by { |row| row[:mtime] }
                .reverse
-    end
-
-    def show
-      @event = YAML.load_file(params[:path])
     end
 
     def start
@@ -56,22 +52,21 @@ module SqlProbe
     # Expands the events row with columns from totals.
     def pivot_counts(events, totals)
       events
-        .group_by { |g| [g[:name], g[:path], g[:queries]] }
-        .map do |(name, path, queries), events|
+        .group_by { |g| [g[:name], g[:path], g[:queries], g[:mtime]] }
+        .map do |(name, path, queries, mtime), group_events|
           row = {
             name: name,
             path: path,
-            'Total Queries' => queries
+            mtime: mtime,
+            queries: queries,
+            values: {}
           }
-          totals.each_with_object(row) do |(table, _), agg|
-            agg[table] = events.reduce(0) do |acc, elem|
-              if elem[:tables][table]
-                acc + 1
-              else
-                acc
-              end
+          totals.each_with_object(row[:values]) do |(table, _), agg|
+            agg[table] = group_events.reduce(0) do |acc, elem|
+              elem[:tables][table] ? acc + 1 : acc
             end
           end
+          row
         end
     end
 
