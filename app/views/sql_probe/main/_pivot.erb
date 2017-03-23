@@ -1,5 +1,5 @@
 <% pivot ||= raise ArgumentError, '`pivot` is a required partial argument!' %>
-<% headers = pivot.first.try(:keys) %>
+<% first = pivot.first %>
 <% content_for :head do %>
 <style>
   th.rotate {
@@ -28,16 +28,19 @@
 <table class="table table-bordered table-striped table-condensed" style="border:none; width: inherit">
   <tr class='clear'>
     <th class='clear'></th>
-    <% headers[2..-1].each do |header| %>
+    <th class='rotate clear'><div><span>Total Queries</span></div></th>
+    <% first[:values].each_key do |header| %>
       <th class='rotate clear'><div><span><%= header %></span></div></th>
     <% end %>
   </tr>
 
   <% pivot.each do |event| %>
     <tr>
-      <td><%= link_to(event[:name], event_path(path: event[:path])) %></td>
-      <th class="text-right td-pivot"><%= event['Total Queries'] %></th>
-      <% event.values[3..-1].each do |count| %>
+      <td>
+        <%= link_to(event[:name], event_path(path: event[:path])) %>
+      </td>
+      <th class="text-right td-pivot"><%= event[:queries] %></th>
+      <% event[:values].each_value do |count| %>
         <td class="text-center td-pivot"><%= count > 0 ? count : nil %></td>
       <% end %>
     </tr>
