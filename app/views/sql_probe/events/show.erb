@@ -48,6 +48,15 @@ a.caller-link:focus {
 
 <div class="panel panel-default">
   <div class="panel-heading">
+    <h3 class="panel-title">Timeline</h3>
+  </div>
+  <div id="timeline">
+    <%= render 'timeline', data: @timeline_data %>
+  </div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
     <h3 id="frequency" class="panel-title">Statements by Frequency</h3>
   </div>
   <div class="panel-body">

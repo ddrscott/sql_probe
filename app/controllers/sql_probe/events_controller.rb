@@ -6,8 +6,18 @@ module SqlProbe
 
       merge_with_index!(@event['events'])
 
+      @timeline_data = build_timeline_data(@event['events'])
+
       @event['events'] = consolidate_events_by_caller(@event['events'])
     end
+
+    def build_timeline_data(events)
+      base = 0.0
+      @event['events'].map do |event|
+        [event['sql'], base, (base += event['duration'])]
+      end
+    end
+    helper_method :timeline_data
 
     def code
       if params[:locator] =~ /(.*):(\d+):/
