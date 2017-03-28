@@ -4,7 +4,7 @@
   border-top: 1px solid #888;
   background: #eee;
   width: 100%;
-  height: 20em;
+  height: 1.75em;
   position: fixed;
   bottom: 0;
   left: 0;
@@ -50,9 +50,8 @@ a.caller-link:focus {
   <div class="panel-heading">
     <h3 class="panel-title">Timeline</h3>
   </div>
-  <div id="timeline">
-    <%= render 'timeline', data: @timeline_data %>
-  </div>
+  <%= render 'timeline', data: @timeline_data do %>
+  <% end %>
 </div>
 
 <div class="panel panel-default">
@@ -80,7 +79,7 @@ a.caller-link:focus {
   </table>
 </div>
 
-<div class="panel panel-default sync-margin" style="margin-bottom: 20em">
+<div class="panel panel-default sync-margin" style="margin-bottom: 1.75em">
   <div class="panel-heading">
     <h3 id="natural" class="panel-title">Statements in Natural Execute Order</h3>
   </div>
@@ -140,6 +139,11 @@ $(document).ready(function() {
 
         // keep focus on original clicked thing
         $($link).focus();
+
+        var resizable = $('#caller-resizable');
+        if (resizable.height() < 200) {
+          resizable.height(200);
+        }
       },
       error: function (data) {
         console.error('could not get source. data: ', data);
