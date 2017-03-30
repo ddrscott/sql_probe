@@ -1,0 +1,157 @@
+<% content_for :head do %>
+<style>
+#modal-sql,
+#modal-caller
+{
+  font-family: monospace;
+  font-size: .8em;
+  overflow: scroll;
+}
+
+#modal-code {
+  position: absolute;
+  left: 0;
+  right: 1em;
+  top: 0; 
+  bottom: 3em;
+  border-left: 1px solid #888;
+}
+
+.modal-full {
+  position: absolute;
+  left: 1em;
+  right: 1em;
+  top: 1em;
+  bottom: 1em;
+  display: block;
+  width: inherit;
+  margin: inherit;
+}
+
+.full-height
+{
+  position: relative;
+  height: 100%;
+}
+
+.padding {
+  padding: 1em;
+}
+
+a.active {
+  /* Based on bootstrap alert-info */
+  color: #31708f;
+  background-color: #d9edf7;
+}
+
+</style>
+<% end %>
+
+<div id="modal-event" class="modal" tabindex="-1" role="dialog">
+  <div class="modal-dialog modal-full" role="document">
+    <div class="modal-content full-height">
+      <div class="modal-body full-height">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs" role="tablist">
+          <li role="presentation" class="active"><a href="#tab-sql" aria-controls="sql" role="tab" data-toggle="tab">SQL</a></li>
+          <li role="presentation"><a href="#tab-caller" aria-controls="caller" role="tab" data-toggle="tab">Caller/Source</a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content full-height">
+          <div role="tabpanel" class="tab-pane full-height active" id="tab-sql">
+            <div id="modal-sql" class="padding">SQL</div>
+          </div>
+          <div role="tabpanel" class="tab-pane full-height" id="tab-caller">
+            <div class="row full-height">
+              <div class="col-xs-5 full-height padding">
+                <div class="btn-group text-right" role="group" aria-label="Caller Nav">
+                  <button type="button" onclick="SqlDialog.loadPrevious()" class="btn btn-default">Previous</button>
+                  <button type="button" onclick="SqlDialog.loadNext()" class="btn btn-default">Next</button>
+                </div>
+                <div id="modal-caller">Caller</div>
+              </div>
+              <div class="col-xs-7 full-height">
+                <div id="modal-code" class="padding">Code</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<% content_for :javascript do %>
+<script>
+window.SqlDialog = {
+  currentCallerIndex: 0,
+  show: function(event) {
+    this.event = event;
+    $('#modal-sql').text(event.sql);
+    $('#modal-caller').html(this.callerToLinks(event.caller));
+    this.currentCallerIndex = 0;
+    this.loadSource(0);
+    $('#modal-event').modal('show', {backdrop: false});
+  },
+  loadSource: function(index) {
+    var locator = this.event.caller[index];
+    this.currentCallerIndex = index;
+
+    $('#modal-caller .locator').removeClass('active');
+    $($('#modal-caller .locator')[index]).addClass('active');
+
+    $.ajax({
+      url: <%= raw url_for(controller: 'events', action: 'code').to_json %>,
+      data: {
+        locator: locator
+      },
+      success: function (data) {
+        var editor = ace.edit("modal-code");
+        editor.getSession().setMode("ace/mode/ruby");
+        editor.setReadOnly(true);
+
+        editor.setValue(data.code);
+
+        // resize() is required to fix a bug.
+        // @see http://stackoverflow.com/a/23748891/613772
+        editor.resize(true);
+        editor.gotoLine(data.line);
+
+        // keep focus on original clicked thing
+        $('#modal-caller').focus();
+      },
+      error: function (data) {
+        console.error('could not get source. data: ', data);
+      }
+    });
+  },
+  // absolute modulo, not a remainder.
+  mod: function(n, m) {
+    return ((n % m) + m) % m
+  },
+  loadNext: function() { this.loadDirection(1) },
+  loadPrevious: function() { this.loadDirection(-1) },
+  loadDirection: function(dir) {
+    var idx = this.mod(this.currentCallerIndex + dir, this.event.caller.length);
+    this.loadSource(idx);
+  },
+  callerToLinks: function(callers) {
+    var $this = this;
+    var links = [];
+    $.each(callers, function(i, caller) {
+      var link = $('<a class="locator"/>').
+        attr('href', '#').
+        text(caller).
+        on('click', function(e){
+          e.preventDefault();
+          $this.loadSource(i);
+        });
+      links.push($('<li />').append(link));
+    });
+    return $('<ul class="padding" />').html(links);
+  }
+}
+</script>
+<% end %>
+

@@ -8,7 +8,7 @@ module SqlProbe
 
       @timeline_data = build_timeline_data(@event['events'])
 
-      @event['events'] = consolidate_events_by_caller(@event['events'])
+      @event['consolidated'] = consolidate_events_by_caller(@event['events'])
     end
 
     def build_timeline_data(events)

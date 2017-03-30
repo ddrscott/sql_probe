@@ -15,7 +15,7 @@ module SqlProbe
         subscription_name = ActiveSupport::Notifications.subscribe('sql.active_record') do |*args|
           event = EventWithCaller.new(*args)
           event.duration  # force duration calculation
-          event.caller = caller
+          event.caller = Utils.reject_gem_paths(caller)
           events << event
         end
         begin
