@@ -26,7 +26,7 @@ svg g:first-of-type rect:not(:last-child) {
   <div class="panel-heading">
     <h3 class="panel-title">Timeline</h3>
   </div>
-  <div id="timeline"></div>
+  <div id="timeline"><div class="padding">Loading...</div></div>
 </div>
 
 <%= render 'details' %>
@@ -67,14 +67,16 @@ window.sqlEventData = <%= raw @event['events'].to_json %>;
 
       timeline.draw(dataTable, options);
       google.visualization.events.addListener(timeline, 'select', function() {
-        SqlDialog.show(sqlEventData[row]);
+        var row = timeline.getSelection()[0].row;
+        EventDetailDialog.show(sqlEventData[row]);
       });
     }
   }
 
   // FIXME: this is just for testing, remove when I'm done.
   $(document).ready(function() {
-    SqlDialog.show(sqlEventData[0]);
+    EventDetailDialog.show(sqlEventData[0]);
+    loadTimeline();
   });
 })();
   </script>

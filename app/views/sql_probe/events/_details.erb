@@ -8,13 +8,33 @@
   overflow: scroll;
 }
 
+#modal-sql {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 1em;
+  bottom: 3em;
+}
+
+#modal-caller {
+  position: absolute;
+  top: 4em;
+  left: 1em;
+  right: 1em;
+  bottom: 3em;
+  word-wrap : break-word;
+}
+#modal-caller li {
+  list-style: none;
+}
+
 #modal-code {
   position: absolute;
   left: 0;
   right: 1em;
   top: 0; 
   bottom: 3em;
-  border-left: 1px solid #888;
+  border-left: 1px solid #ddd;
 }
 
 .modal-full {
@@ -67,8 +87,8 @@ a.active {
             <div class="row full-height">
               <div class="col-xs-5 full-height padding">
                 <div class="btn-group text-right" role="group" aria-label="Caller Nav">
-                  <button type="button" onclick="SqlDialog.loadPrevious()" class="btn btn-default">Previous</button>
-                  <button type="button" onclick="SqlDialog.loadNext()" class="btn btn-default">Next</button>
+                  <button type="button" onclick="EventDetailDialog.loadPrevious()" class="btn btn-default">Previous</button>
+                  <button type="button" onclick="EventDetailDialog.loadNext()" class="btn btn-default">Next</button>
                 </div>
                 <div id="modal-caller">Caller</div>
               </div>
@@ -84,15 +104,28 @@ a.active {
 </div>
 <% content_for :javascript do %>
 <script>
-window.SqlDialog = {
+window.EventDetailDialog = {
   currentCallerIndex: 0,
   show: function(event) {
     this.event = event;
-    $('#modal-sql').text(event.sql);
+    this.loadSql(event.sql);
     $('#modal-caller').html(this.callerToLinks(event.caller));
     this.currentCallerIndex = 0;
     this.loadSource(0);
     $('#modal-event').modal('show', {backdrop: false});
+  },
+  loadSql: function(sql) {
+    var sqlEditor = ace.edit("modal-sql");
+    sqlEditor.getSession().setMode("ace/mode/sql");
+    sqlEditor.setReadOnly(true);
+    sqlEditor.setValue(this.cleanSql(sql));
+    sqlEditor.resize(true);
+    sqlEditor.gotoLine(0, 0);
+  },
+  cleanSql: function(sql) {
+    return sql
+      .replace(/\s*\b(SELECT|FROM|WHERE|GROUP|HAVING|LEFT JOIN|LEFT OUTER JOIN|INNER JOIN|JOIN|RIGHT|ORDER|WINDOW)\b/ig, "\n$1")
+      .trim();
   },
   loadSource: function(index) {
     var locator = this.event.caller[index];
@@ -107,16 +140,15 @@ window.SqlDialog = {
         locator: locator
       },
       success: function (data) {
-        var editor = ace.edit("modal-code");
-        editor.getSession().setMode("ace/mode/ruby");
-        editor.setReadOnly(true);
-
-        editor.setValue(data.code);
+        var codeEditor = ace.edit("modal-code");
+        codeEditor.getSession().setMode("ace/mode/ruby");
+        codeEditor.setReadOnly(true);
+        codeEditor.setValue(data.code);
 
         // resize() is required to fix a bug.
         // @see http://stackoverflow.com/a/23748891/613772
-        editor.resize(true);
-        editor.gotoLine(data.line);
+        codeEditor.resize(true);
+        codeEditor.gotoLine(data.line);
 
         // keep focus on original clicked thing
         $('#modal-caller').focus();
@@ -137,13 +169,16 @@ window.SqlDialog = {
     this.loadSource(idx);
   },
   callerToLinks: function(callers) {
+    function stripRoot(line) {
+      return line.replace(<%= raw Rails.root.to_s.to_json %>, '.');
+    }
     var $this = this;
     var links = [];
     $.each(callers, function(i, caller) {
-      var link = $('<a class="locator"/>').
-        attr('href', '#').
-        text(caller).
-        on('click', function(e){
+      var link = $('<a class="locator"/>')
+        .attr('href', '#')
+        .text(stripRoot(caller))
+        .on('click', function(e){
           e.preventDefault();
           $this.loadSource(i);
         });
