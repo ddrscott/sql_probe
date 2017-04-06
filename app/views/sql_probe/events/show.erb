@@ -32,11 +32,8 @@ svg g:first-of-type rect:not(:last-child) {
 <%= render 'details' %>
 
 <% content_for :javascript do %>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-  <script>
-$(document).ready(function() {
-});
-
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script>
 window.sqlEventData = <%= raw @event['events'].to_json %>;
 
 (function() {
@@ -73,11 +70,10 @@ window.sqlEventData = <%= raw @event['events'].to_json %>;
     }
   }
 
-  // FIXME: this is just for testing, remove when I'm done.
   $(document).ready(function() {
-    EventDetailDialog.show(sqlEventData[0]);
+    // EventDetailDialog.show(sqlEventData[0]);
     loadTimeline();
   });
 })();
-  </script>
+</script>
 <% end %>
