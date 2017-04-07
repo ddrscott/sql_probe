@@ -58,6 +58,14 @@
   padding: 1em;
 }
 
+.file-name {
+  font-weight: bolder;
+  background: #d9edf7;
+  display: inline-block;
+  padding-left: .5em;
+  padding-right: .5em;
+}
+
 a.active {
   /* Based on bootstrap alert-info */
   color: #31708f;
@@ -172,12 +180,16 @@ window.EventDetailDialog = {
     function stripRoot(line) {
       return line.replace(<%= raw Rails.root.to_s.to_json %>, '.');
     }
+
+    function wrapFileName(line) {
+      return line.replace(/([^\/]+)(:in)/, "<div class='file-name'>$1</div>$1$2");
+    }
     var $this = this;
     var links = [];
     $.each(callers, function(i, caller) {
       var link = $('<a class="locator"/>')
         .attr('href', '#')
-        .text(stripRoot(caller))
+        .html(wrapFileName(stripRoot(caller)))
         .on('click', function(e){
           e.preventDefault();
           $this.loadSource(i);
