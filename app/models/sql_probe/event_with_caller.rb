@@ -2,6 +2,7 @@ module SqlProbe
   # Adds caller attribute to Instrumented Event
   class EventWithCaller < ActiveSupport::Notifications::Event
     attr_reader :caller
+    attr_accessor :elapsed
 
     def initialize(*args)
       super
