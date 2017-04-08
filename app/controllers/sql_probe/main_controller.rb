@@ -52,11 +52,12 @@ module SqlProbe
     # Expands the events row with columns from totals.
     def pivot_counts(events, totals)
       events
-        .group_by { |g| [g[:name], g[:path], g[:queries], g[:mtime]] }
-        .map do |(name, path, queries, mtime), group_events|
+        .group_by { |g| [g[:name], g[:path], g[:queries], g[:mtime], g[:duration]] }
+        .map do |(name, path, queries, mtime, duration), group_events|
           row = {
             name: name,
             path: path,
+            duration: duration,
             mtime: mtime,
             queries: queries,
             values: {}

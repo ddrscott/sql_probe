@@ -10,9 +10,14 @@ module SqlProbe
         events << EventWithCaller.new(*args)
       end
       begin
-        block.call
-        EventWriter.write_to_file_system(name: name, params: params, events: events, output_base_path: SqlProbe.output_base_dir)
-        events
+        ms = Benchmark.ms { block.call }
+        EventWriter.write_to_file_system(
+          name: name,
+          duration: ms,
+          params: params,
+          events: events,
+          output_base_path: SqlProbe.output_base_dir
+        )
       ensure
         ActiveSupport::Notifications.unsubscribe(subscription_name)
       end

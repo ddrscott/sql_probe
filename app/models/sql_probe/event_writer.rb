@@ -3,13 +3,13 @@ module SqlProbe
     module_function
 
     # Helper to write out raw events to an output location
-    def write_to_file_system(name:, events:, output_base_path:, params:nil)
+    def write_to_file_system(name:, events:, output_base_path:, duration:, params: nil)
       # ignore all Rails introspection noise
-      events.reject!{|e| e.payload[:name] == 'SCHEMA'}
+      events.reject! { |e| e.payload[:name] == 'SCHEMA' }
       return if events.empty?
 
       # reformat event to be more "readable"
-      events.map!{|e| flatten_event_payload(e) }
+      events.map! { |e| flatten_event_payload(e) }
 
       file_id = Time.now.to_f
       output_dir = File.join(output_base_path, name)
@@ -17,9 +17,10 @@ module SqlProbe
       full_path = File.join(output_dir, "#{file_id}.yml")
 
       # write contents
-      File.open(full_path, 'w') do |f|
-        f << {
+      File.open(full_path, 'w') do |file|
+        file << {
           'name' => name,
+          'duration' => duration,
           'params' => params,
           'events' => events
         }.to_yaml
