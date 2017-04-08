@@ -27,6 +27,10 @@ module SqlProbe
       end
     end
 
+    def raw
+      send_file params[:path], type: 'application/yaml'
+    end
+
     private
 
     def merge_with_index!(events)
