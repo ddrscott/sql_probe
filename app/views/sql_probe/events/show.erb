@@ -15,6 +15,10 @@ svg g:first-of-type rect:not(:last-child) {
 
 <div class="panel panel-default">
   <div class="panel-heading">
+    <div class="btn-group pull-right" role="group" aria-label="...">
+      <%= link_to 'View Raw Data', view_raw_path(path: params[:path]), class: 'btn btn-default btn-xs' %>
+      <%= link_to 'Download', download_raw_path(path: params[:path]), class: 'btn btn-default btn-xs' %>
+    </div>
     <h3 class="panel-title">General Action Info</h3>
   </div>
   <div class="panel-body">

@@ -7,6 +7,6 @@ SqlProbe::Engine.routes.draw do
 
   get 'event', to: 'events#show'
   get 'event/code', to: 'events#code'
-  get 'event/raw', to: 'events#raw'
-  get 'event/view', to: 'events#view'
+  get 'event/raw', to: 'events#raw', as: :download_raw
+  get 'event/view', to: 'events#view', as: :view_raw
 end
