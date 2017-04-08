@@ -31,6 +31,10 @@ module SqlProbe
       send_file params[:path], type: 'application/yaml'
     end
 
+    def view
+      @data = File.read(params[:path])
+    end
+
     private
 
     def merge_with_index!(events)

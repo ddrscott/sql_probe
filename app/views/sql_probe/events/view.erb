@@ -1,0 +1,23 @@
+<% content_for :head do %>
+<style>
+#editor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+</style>
+<% end %>
+
+<div id="editor" class="padding">Code</div>
+<% content_for :javascript do %>
+<script>
+  var codeEditor = ace.edit("editor");
+  codeEditor.getSession().setMode("ace/mode/yaml");
+  codeEditor.setReadOnly(true);
+  codeEditor.setValue(<%= raw @data.to_json %>);
+  codeEditor.gotoLine(data.line);
+</script>
+<% end %>
+

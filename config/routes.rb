@@ -8,4 +8,5 @@ SqlProbe::Engine.routes.draw do
   get 'event', to: 'events#show'
   get 'event/code', to: 'events#code'
   get 'event/raw', to: 'events#raw'
+  get 'event/view', to: 'events#view'
 end
