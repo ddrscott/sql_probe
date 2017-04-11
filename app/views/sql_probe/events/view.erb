@@ -18,6 +18,7 @@
   codeEditor.setReadOnly(true);
   codeEditor.setValue(<%= raw @data.to_json %>);
   codeEditor.gotoLine(data.line);
+  codeEditor.setUseWrapMode(false);
 </script>
 <% end %>
 

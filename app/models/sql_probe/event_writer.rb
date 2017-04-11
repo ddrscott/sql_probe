@@ -23,7 +23,7 @@ module SqlProbe
           'duration' => duration,
           'params' => params,
           'events' => events
-        }.to_yaml
+        }.to_yaml(line_width: -1)
       end
     end
 
