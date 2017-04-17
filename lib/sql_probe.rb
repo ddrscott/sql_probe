@@ -11,12 +11,21 @@ module SqlProbe
     @output_base_dir = output_path
   end
 
+  def self.listen_token_path
+    File.join("#{output_base_dir}", '.listening')
+  end
+
   def self.listening?
-    @listening.present?
+    File.file?(listen_token_path)
   end
 
   def self.listening=(is_listening)
-    @listening = is_listening
+    if is_listening
+      FileUtils.mkdir_p(output_base_dir)
+      File.open(listen_token_path, 'w'){|f| f << Time.zone.now.to_s}
+    else
+      FileUtils.rm_rf(listen_token_path)
+    end
   end
 
   def self.clear_output_dir
