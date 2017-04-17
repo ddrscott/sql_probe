@@ -12,11 +12,17 @@ module SqlProbe
   end
 
   def self.listening?
-    @listening.present?
+    if File.exists?(Rails.root.join('tmp/sql_probe_state.yml'))
+      YAML.load_file(Rails.root.join('tmp/sql_probe_state.yml'))['listening']
+    else
+      false
+    end
   end
 
   def self.listening=(is_listening)
-    @listening = is_listening
+    File.open(Rails.root.join('tmp/sql_probe_state.yml'), 'w') do |f|
+      f.puts({'listening' => is_listening}.to_yaml)
+    end
   end
 
   def self.clear_output_dir
