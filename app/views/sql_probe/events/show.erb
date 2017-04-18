@@ -75,7 +75,7 @@ window.sqlEventData = <%= raw @event['events'].to_json %>;
   }
 
   $(document).ready(function() {
-    EventDetailDialog.show(sqlEventData[0]);
+    <%# EventDetailDialog.show(sqlEventData[0]); %>
     loadTimeline();
   });
 })();
