@@ -1,6 +1,6 @@
 module SqlProbe
   # Manage an Event File
-  class EventsController < ApplicationController
+  class EventsController < SqlProbe::ApplicationController
     def show
       @event = YAML.load_file(params[:path])
 

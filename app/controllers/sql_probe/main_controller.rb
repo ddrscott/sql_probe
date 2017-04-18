@@ -1,6 +1,6 @@
 module SqlProbe
   # Manage the dashboard
-  class MainController < ApplicationController
+  class MainController < SqlProbe::ApplicationController
     def index
       @events = filter_events(StatementList.new.to_a, params_sql_filter)
       @totals = rollup_counts(@events)
