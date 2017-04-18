@@ -3,8 +3,10 @@ module SqlProbe
   module Utils
     module_function
 
+    VENDOR_PATH = Rails.root.join('vendor').to_s
+
     def reject_gem_paths(caller)
-      caller.reject { |r| Gem.default_path.detect { |d| r.include?(d) } }
+      caller.reject { |r| r.include?(VENDOR_PATH) || Gem.default_path.detect { |d| r.include?(d) } }
     end
 
     def pretty_sql(sql)
