@@ -12,10 +12,9 @@ module SqlProbe
     def build_timeline_data(events)
       base = 0.0
       @event['events'].map do |event|
-        [event['sql'], base, (base += event['elapsed'])]
+        [event['sql'], base, (base += (event['elapsed']))]
       end
     end
-    helper_method :timeline_data
 
     def code
       if params[:locator] =~ /(.*):(\d+):/

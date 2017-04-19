@@ -48,11 +48,12 @@ window.sqlEventData = <%= raw @event['events'].to_json %>;
       var container = document.getElementById('timeline');
       var timeline = new google.visualization.Timeline(container);
       var dataTable = new google.visualization.DataTable();
+      var rows = <%= raw JSON.pretty_generate(@timeline_data) %>;
 
       dataTable.addColumn({ type: 'string', id: 'Title' });
       dataTable.addColumn({ type: 'number', id: 'Start' });
       dataTable.addColumn({ type: 'number', id: 'End' });
-      dataTable.addRows(<%= raw JSON.pretty_generate(@timeline_data) %>);
+      dataTable.addRows(rows);
 
       var options = {
         // @see http://stackoverflow.com/a/18643370/613772

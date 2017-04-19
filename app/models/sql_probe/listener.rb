@@ -12,7 +12,7 @@ module SqlProbe
         event = EventWithCaller.new(*args)
 
         # calculate elapsed time
-        previous.elapsed = (event.time - previous.time) / 1000.0 if previous
+        previous.elapsed = (event.time - previous.time) * 1000.0 if previous
         previous = event
         events << event
       end
@@ -20,7 +20,7 @@ module SqlProbe
       begin
         ms = Benchmark.ms { block.call }
         # calc the last event time
-        previous.elapsed = (Time.now - previous.time) / 1000.0 if previous
+        previous.elapsed = (Time.now - previous.time) * 1000.0 if previous
 
         EventWriter.write_to_file_system(
           name: name,
