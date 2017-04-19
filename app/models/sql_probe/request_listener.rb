@@ -7,7 +7,8 @@ module SqlProbe
     end
 
     def sql_probe_event_name
-      "#{params[:controller]}##{params[:action]}"
+      values = params.except(:controller, :action).values
+      "#{params[:controller]}##{params[:action]}#{values.any? ? "(#{values.join(', ')})" : ''}"
     end
 
     def sql_probe_listen(&block)

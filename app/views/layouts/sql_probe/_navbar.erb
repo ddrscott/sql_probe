@@ -1,4 +1,4 @@
-<nav class="navbar navbar-default">
+<nav class="navbar navbar-default navbar-fixed-top">
   <div class="container-fluid">
     <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
@@ -8,17 +8,17 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <%= link_to 'SQL Probe', {action: 'index'}, class: 'navbar-brand' %>
+      <%= link_to 'SQL Probe', {controller: 'sql_probe/main', action: 'index'}, class: 'navbar-brand' %>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li class="<%= params[:sql_filter].blank? && 'active' %>">
-          <%= link_to 'View All', {action: 'index'} %>
+        <li class="<%= params[:sql_filter].blank? && params[:controller] == 'sql_probe/main' && 'active' %>">
+          <%= link_to 'View All', {controller: 'sql_probe/main', action: 'index'} %>
         </li>
-        <li class="<%= params[:sql_filter].present? && 'active' %>">
-          <%= link_to 'Only Changes', {action: 'index', sql_filter: 'insert,update,delete'.html_safe} %>
+        <li class="<%= params[:sql_filter].present? && params[:controller] == 'sql_probe/main' && 'active' %>">
+          <%= link_to 'Only Changes', {controller: 'sql_probe/main', action: 'index', sql_filter: 'insert,update,delete'.html_safe} %>
         </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
