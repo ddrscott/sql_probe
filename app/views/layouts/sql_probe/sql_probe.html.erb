@@ -54,5 +54,6 @@ body {
 <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" integrity="sha256-xrr4HH5eSY+cFz4SH7ja/LaAi9qcEdjMpeMP49/iOLs=" crossorigin="anonymous"></script>
 <%= javascript_include_tag "sql_probe/application" %>
 <%= yield :javascript %>
+<%= render 'layouts/sql_probe/ga' if Rails.env.production? %>
 </body>
 </html>
