@@ -20,6 +20,9 @@
         <li class="<%= params[:sql_filter].present? && params[:controller] == 'sql_probe/main' && 'active' %>">
           <%= link_to 'Only Changes', {controller: 'sql_probe/main', action: 'index', sql_filter: 'insert,update,delete'.html_safe} %>
         </li>
+        <li class="<%= params[:controller] == 'sql_probe/live' && 'active' %>">
+          <%= link_to 'Live', {controller: 'sql_probe/live', action: 'index'} %>
+        </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li class="navbar-form">

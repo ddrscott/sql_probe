@@ -1,3 +1,5 @@
+require 'tubesock'
+
 module SqlProbe
   class Engine < ::Rails::Engine
     isolate_namespace SqlProbe

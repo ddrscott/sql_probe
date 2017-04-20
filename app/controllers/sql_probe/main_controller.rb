@@ -16,7 +16,7 @@ module SqlProbe
         SqlProbe.listening = true
         flash[:success] = 'Listening enabled'
       end
-      redirect_to :back
+      redirect_to :live
     end
 
     def stop
@@ -26,7 +26,7 @@ module SqlProbe
       else
         flash[:success] = 'Listening already disabled'
       end
-      redirect_to :back
+      redirect_to :root
     end
 
     def reset

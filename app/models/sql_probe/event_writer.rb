@@ -17,7 +17,7 @@ module SqlProbe
       full_path = File.join(output_dir, "#{file_id}.yml")
 
       # write contents
-      File.open(full_path, 'w') do |file|
+      result = File.open(full_path, 'w') do |file|
         file << {
           'name' => name,
           'duration' => duration,
@@ -25,6 +25,8 @@ module SqlProbe
           'events' => events
         }.to_yaml(line_width: -1)
       end
+      ActiveSupport::Notifications.instrument 'sql_probe.file', path: full_path
+      result
     end
 
     def flatten_event_payload(event)

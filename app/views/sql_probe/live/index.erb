@@ -1,1 +1,8 @@
-Live!
+<%= content_for :javascript do %>
+  <script>
+SqlProbe.initLive($('#output'), <%= raw event_path(path: 'PATH').to_json %>);
+  </script>
+<% end %>
+
+<div id='output'>
+</div>
