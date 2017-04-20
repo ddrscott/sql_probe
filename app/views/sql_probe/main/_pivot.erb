@@ -28,6 +28,7 @@
 <table class="table table-bordered table-striped table-condensed" style="border:none; width: inherit">
   <tr class='clear'>
     <th class='clear'></th>
+    <th class='rotate clear'><div><span>Time</span></div></th>
     <th class='rotate clear'><div><span>Total Queries</span></div></th>
     <th class='rotate clear'><div><span>Duration ms</span></div></th>
     <% first[:values].each_key do |header| %>
@@ -40,8 +41,9 @@
       <td>
         <%= link_to(event[:name], event_path(path: event[:path])) %>
       </td>
+      <td><%= event[:mtime].strftime('%-I:%M:%S %P') %></td>
       <th class="text-right td-pivot"><%= event[:queries] %></th>
-      <th class="text-right td-pivot"><%= event[:duration].round(1) %></th>
+      <td class="text-right td-pivot"><%= event[:duration].round %></td>
       <% event[:values].each_value do |count| %>
         <td class="text-center td-pivot"><%= count > 0 ? count : nil %></td>
       <% end %>
