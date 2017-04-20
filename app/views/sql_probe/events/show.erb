@@ -19,18 +19,20 @@ svg g:first-of-type rect:not(:last-child) {
       <%= link_to 'View Raw Data', view_raw_path(path: params[:path]), class: 'btn btn-default btn-xs' %>
       <%= link_to 'Download', download_raw_path(path: params[:path]), class: 'btn btn-default btn-xs' %>
     </div>
+    <h3 class="panel-title">Timeline
+      <small>Select a timeline block to view full query, backtrace and source browser.</small>
+    </h3>
+  </div>
+  <div id="timeline"><div class="padding">Loading...</div></div>
+</div>
+
+<div class="panel panel-default">
+  <div class="panel-heading">
     <h3 class="panel-title">General Action Info</h3>
   </div>
   <div class="panel-body">
     <div class="text-pre"><%= JSON.pretty_generate @event.except('events', 'consolidated') %></div>
   </div>
-</div>
-
-<div class="panel panel-default">
-  <div class="panel-heading">
-    <h3 class="panel-title">Timeline</h3>
-  </div>
-  <div id="timeline"><div class="padding">Loading...</div></div>
 </div>
 
 <%= render 'details' %>
