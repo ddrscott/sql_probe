@@ -36,7 +36,7 @@ Split(['.split-c', '.split-d'], {
   cursor: 'row-resize'
 })
 
-LiveFeed.start(<%= raw live_feed_path.to_json %>);
+LiveFeed.start(<%= raw live_feed_ws_url.to_json %>);
   </script>
 <% end %>
 

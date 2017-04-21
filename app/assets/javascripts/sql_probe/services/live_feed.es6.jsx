@@ -3,8 +3,8 @@
  * 'sql_probe.data': { name, start_time, duration, events, params }
  */
 const LiveFeed = {
-  start(liveFeedPath) {
-    const ws = new WebSocket("ws://" + window.location.host + liveFeedPath);
+  start(webSocketUrl) {
+    const ws = new WebSocket(webSocketUrl);
     ws.onmessage = (event) => {
       if (event.data.length && event.data.startsWith('{')) {
         try {

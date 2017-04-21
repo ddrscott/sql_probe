@@ -21,5 +21,9 @@ module SqlProbe
     def ghetto_bar(size, *attrs)
       content_tag(:div, "#{'█' * size}&nbsp;#{size}".html_safe, *attrs)
     end
+
+    def live_feed_ws_url
+      live_feed_url({}, {only_path: false}).gsub(/^http/,'ws')
+    end
   end
 end
