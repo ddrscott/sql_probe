@@ -10,10 +10,66 @@
  * defined in the other CSS/SCSS files in this directory. It is generally better to create a new
  * file per style scope.
  *
+ *= require bootstrap-3.3.7
  *= require_tree .
  *= require_self
  */
 
-pre.json {
-  font-size: .8em;
+*, *:before, *:after {
+  box-sizing: border-box;
+}
+
+body {
+  padding-top: 72px;
+}
+
+html, body {
+  height: 100%;
+}
+
+.text-pre {
+  font-size: .9em;
+  font-family: monospace;
+  white-space: pre;
+}
+
+.td-scroll {
+  max-width: 50em;
+  overflow: scroll;
+}
+
+
+[data-react-class=Splits],
+[data-react-class=Splits] > * {
+  height: 100%;
+}
+
+.split,
+.gutter {
+  float: left;
+  height: 100%;
+}
+.split {
+  overflow: scroll;
+}
+
+.gutter {
+  background: #fee;
+  border-right: 1px solid #ddd;
+  border-left: 1px solid #aaa;
+  cursor: col-resize;
+}
+
+.split-first {
+  /* background: #fee; */
+}
+
+.split-last {
+  background: #eef;
+}
+
+[data-react-class=Live],
+#live-timeline {
+  height: 100%;
+  width: 100%;
 }

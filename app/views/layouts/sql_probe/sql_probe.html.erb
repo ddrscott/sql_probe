@@ -6,54 +6,17 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>SQL Probe</title>
   <%= stylesheet_link_tag    "sql_probe/application", media: "all" %>
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
-
-  <script src="//code.jquery.com/jquery-3.2.0.min.js" integrity="sha256-JAW99MJVpJBGcbzEuXk4Az05s/XyDdBomFqNlM3ic+I=" crossorigin="anonymous"></script>
-  <script src="//code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/ace/1.2.6/ace.js" integrity="sha256-xrr4HH5eSY+cFz4SH7ja/LaAi9qcEdjMpeMP49/iOLs=" crossorigin="anonymous"></script>
-  <%= javascript_include_tag "sql_probe/application" %>
 
   <%= csrf_meta_tags %>
-<style>
-*, *:before, *:after {
-  box-sizing: border-box;
-  /*transition: all .2s ease;*/
-}
-
-body {
-  padding-top: 72px;
-}
-
-.text-pre {
-  font-size: .9em;
-  font-family: monospace;
-  white-space: pre;
-}
-
-.td-scroll {
-  max-width: 50em;
-  overflow: scroll;
-}
-
-.textarea-code {
-  font-size: .9em;
-  font-family: monospace;
-  width: 50em;
-  height: 22em;
-}
-
-</style>
   <%= yield :head %>
 </head>
 <body>
 
 <%= render 'layouts/sql_probe/navbar' %>
-<div class="container-fluid">
-  <%= yield %>
-</div>
 
+<%= yield %>
+
+<%= javascript_include_tag "sql_probe/application" %>
 <%= yield :javascript %>
 <%= render 'layouts/sql_probe/ga' if Rails.env.production? %>
 </body>
