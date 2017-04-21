@@ -27,13 +27,19 @@ window.SQL_PROBE_CONFIG = <%= raw({ live_feed_path: live_feed_path,
 Split(['.split-a', '.split-b'], {
   sizes: [50,50],
   gutterSize: 3,
-  cursor: 'col-resize'
+  cursor: 'col-resize',
+  onDrag: function() {
+    document.dispatchEvent(new Event('split.resize'));
+  }
 })
 Split(['.split-c', '.split-d'], {
   sizes: [50,50],
   direction: 'vertical',
   gutterSize: 3,
-  cursor: 'row-resize'
+  cursor: 'row-resize',
+  onDrag: function() {
+    document.dispatchEvent(new Event('split.resize'));
+  }
 })
 
 LiveFeed.start(<%= raw live_feed_ws_url.to_json %>);

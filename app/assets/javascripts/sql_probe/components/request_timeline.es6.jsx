@@ -56,6 +56,10 @@ class RequestTimeline extends React.Component {
         dataTable: dataTable,
         options: options
       });
+
+      // resize chart as needed
+      window.addEventListener("resize", () => this.drawChart());
+      document.addEventListener('split.resize', () => this.drawChart());
     });
   }
 
