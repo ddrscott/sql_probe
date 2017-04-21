@@ -3,7 +3,7 @@ module SqlProbe
     module_function
 
     # Helper to write out raw events to an output location
-    def write_to_file_system(name:, events:, output_base_path:, duration:, params: nil)
+    def write_to_file_system(name:, start_time:, events:, output_base_path:, duration:, params: nil)
       # ignore all Rails introspection noise
       events.reject! { |e| e.payload[:name] == 'SCHEMA' }
       return if events.empty?
@@ -20,6 +20,7 @@ module SqlProbe
       result = File.open(full_path, 'w') do |file|
         file << {
           'name' => name,
+          'start_time' => start_time,
           'duration' => duration,
           'params' => params,
           'events' => events

@@ -1,9 +1,11 @@
-<% if flash[:success] %>
-  <div class="alert alert-info" role="alert">
-    <%= flash[:success] %>
-  </div>
-<% end %>
+<div class="container-fluid">
+  <% if flash[:success] %>
+    <div class="alert alert-info" role="alert">
+      <%= flash[:success] %>
+    </div>
+  <% end %>
 
-<%= render 'pivot', pivot: @pivot if @pivot.any? %>
+  <%= render 'pivot', pivot: @pivot if @pivot.any? %>
 
-<%= render 'help' %>
+  <%= render 'help' %>
+</div>

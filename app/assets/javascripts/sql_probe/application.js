@@ -1,7 +1,10 @@
+//= require jquery-3.2.0
+//= require bootstrap-3.3.7
+//= require split-1.2.0
+//= require ace-1.2.6
 //= require react
 //= require react_ujs
 //= require_tree ./components
-//= require ./sql_probe
 
 
 $(document).ready(function(){
