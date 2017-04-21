@@ -64,7 +64,6 @@ class RequestTimeline extends React.Component {
   }
 
   drawChart() {
-    console.log('called drawChart');
     var {timeline, dataTable, options} = this.state;
     if (dataTable.getNumberOfRows() > 0) {
       options.height = $(this.timelineElm).parent().height();

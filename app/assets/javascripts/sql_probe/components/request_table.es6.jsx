@@ -13,7 +13,7 @@ class RequestTable extends React.Component {
 
   renderRows() {
     return this.state.rows.map((row) =>
-      <tr>
+      <tr key={row.start_time}>
         <td>{ row.name }</td>
         <td>{ row.start_time }</td>
         <td>{ row.duration }</td>
@@ -25,13 +25,17 @@ class RequestTable extends React.Component {
   render() {
     return (
       <table className="table table-compressed">
-        <tr>
-          <th>Name</th>
-          <th>Start</th>
-          <th>Duration</th>
-          <th>Queries</th>
-        </tr>
-        { this.renderRows() }
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Start</th>
+            <th>Duration</th>
+            <th>Queries</th>
+          </tr>
+        </thead>
+        <tbody>
+          { this.renderRows() }
+        </tbody>
       </table>
     )
   }
