@@ -25,7 +25,7 @@ module SqlProbe
         mtime:  File.mtime(path),
         name:   yaml['name'],
         duration:   yaml['duration'] || -1.0,
-        tables: table_summary(event['sql'])
+        tables: event.nil? ? [] : table_summary(event['sql'])
       }
     end
 
