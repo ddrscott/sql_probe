@@ -1,29 +1,18 @@
-class Live extends React.Component {
+class RequestTimeline extends React.Component {
   constructor(props) {
     super(props);
-    const ws = new WebSocket("ws://" + window.location.host + props.live_feed_path);
-    ws.onmessage = (event) => {
-      if (event.data.length && event.data.startsWith('{')) {
-        try {
-          var json = JSON.parse(event.data);
-          console.log(json);
-
-          if (this.state.dataTable) {
-            this.state.dataTable.addRow([
-              json.name,
-              json.start_time * 1000,
-              Date.parse(json.events[json.events.length - 1].time)
-            ]);
-          }
-          this.setState((prevState) => ({
-            liveData: prevState.liveData.concat([json])
-          }));
-        } catch(err) {
-          console.error(err);
-          console.log('ignoring message: ', event.data);
-        }
+    LiveFeed.onMessage(json => {
+      if (this.state.dataTable) {
+        this.state.dataTable.addRow([
+          json.name,
+          json.start_time * 1000,
+          Date.parse(json.events[json.events.length - 1].time)
+        ]);
+        this.setState(prevState => ({
+          dataTable: this.state.dataTable
+        }));
       }
-    }
+    })
     this.state = {
       liveData: []
     };

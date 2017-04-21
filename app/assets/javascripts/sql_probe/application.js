@@ -4,8 +4,8 @@
 //= require ace-1.2.6
 //= require react
 //= require react_ujs
+//= require_tree ./services
 //= require_tree ./components
-
 
 $(document).ready(function(){
   // FIXME: react_ujs is suppose to do this for us. But it's not working.

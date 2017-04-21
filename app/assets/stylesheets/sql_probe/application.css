@@ -44,28 +44,36 @@ html, body {
   height: 100%;
 }
 
-.split,
-.gutter {
+.split-horizontal,
+.gutter-horizontal {
   float: left;
   height: 100%;
 }
+
+.gutter-horizontal {
+  cursor: col-resize;
+  border-right: 1px solid #ddd;
+  background: #ccc;
+  border-left: 1px solid #bbb;
+}
+.gutter-vertical {
+  cursor: row-resize;
+  border-top: 1px solid #ddd;
+  background: #ccc;
+  border-bottom: 1px solid #bbb;
+}
+
 .split {
   overflow: scroll;
 }
-
-.gutter {
-  background: #fee;
-  border-right: 1px solid #ddd;
-  border-left: 1px solid #aaa;
-  cursor: col-resize;
+.split-d {
+  /* box-shadow: inset 0 2px 2px #888; */
 }
 
 .split-first {
-  /* background: #fee; */
 }
 
 .split-last {
-  background: #eef;
 }
 
 [data-react-class=Live],
