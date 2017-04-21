@@ -35,6 +35,8 @@ Split(['.split-c', '.split-d'], {
   gutterSize: 3,
   cursor: 'row-resize'
 })
+
+LiveFeed.start(<%= raw live_feed_path.to_json %>);
   </script>
 <% end %>
 
