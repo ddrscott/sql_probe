@@ -1,27 +1,20 @@
-class RequestTimeline extends React.Component {
+class SqlTimeline extends React.Component {
   constructor(props) {
     super(props);
-    LiveFeed.onMessage(json => {
-      if (this.state.dataTable) {
-        this.state.dataTable.addRow([
-          json.name,
-          json.start_time * 1000,
-          Date.parse(json.events[json.events.length - 1].time)
-        ]);
-        this.setState(prevState => ({
-          dataTable: this.state.dataTable,
-          rows: this.state.rows.concat([json])
-        }));
-      }
-    })
+
+    document.addEventListener('sql_probe.load.sql.timeline', (event) => {
+      this.setState(prevState => ({
+        events: event.detail.events
+      }));
+    }, false);
+
     this.state = {
-      rows: []
+      events: []
     };
   }
 
   componentDidMount() {
     this.initChart();
-
     // resize chart as needed
     window.addEventListener("resize", () => this.drawChart());
     document.addEventListener('split.resize', () => this.drawChart());
@@ -30,33 +23,31 @@ class RequestTimeline extends React.Component {
   initChart() {
     google.charts.load('current', {'packages':['timeline']});
     google.charts.setOnLoadCallback(() => {
-      var container = this.timelineElm;
+      var container = this.timelineElm; //document.getElementById('live-timeline');
       var timeline = new google.visualization.Timeline(container);
       var dataTable = new google.visualization.DataTable();
 
       dataTable.addColumn({ type: 'string', id: 'Title' });
       dataTable.addColumn({ type: 'number', id: 'Start' });
       dataTable.addColumn({ type: 'number', id: 'End' });
-      dataTable.addRow(['Started', Date.now() - 1000, Date.now()]);
 
       var options = {
         height: $(container).parent().height(), 
         width: $(container).parent().width(), 
+        // backgroundColor: 'transparent',
         timeline: {
           rowLabelStyle: { fontSize: 12, padding: 0 }
         }
       };
-      google.visualization.events.addListener(timeline, 'select', () => {
+      google.visualization.events.addListener(timeline, 'select', function() {
         var row = timeline.getSelection()[0].row;
-        if (row > 0) {
-          var event = new CustomEvent('sql_probe.load.sql.timeline', {detail: this.state.rows[row - 1]});
-          document.dispatchEvent(event);
-        }
+        console.log('selected: ', row);
+        // EventDetailDialog.show(sqlEventData[row]);
       });
       this.setState({
-        timeline: timeline,
+        timeline:  timeline,
         dataTable: dataTable,
-        options: options
+        options:   options
       });
     });
   }
@@ -65,9 +56,18 @@ class RequestTimeline extends React.Component {
     this.drawChart();
   }
 
+  eventsToDataRow(events) {
+    var base = 0;
+    return events.map((event) => [event.sql, base, (base += event.elapsed) ]);
+  }
+
   drawChart() {
-    var {timeline, dataTable, options} = this.state;
-    if (dataTable.getNumberOfRows() > 0) {
+    const {timeline, dataTable, options, events} = this.state;
+    if (events.length > 0) {
+      if (dataTable.getNumberOfRows() > 0) {
+        dataTable.removeRows(0, dataTable.getNumberOfRows());
+      }
+      dataTable.addRows(this.eventsToDataRow(events));
       options.height = $(this.timelineElm).parent().height();
       options.width = $(this.timelineElm).parent().width();
       // js will bomb if there's no rows
@@ -77,7 +77,8 @@ class RequestTimeline extends React.Component {
 
   render() {
     return (
-      <div ref={(elm) => { this.timelineElm = elm }} />
+      <div ref={(elm) => { this.timelineElm = elm }} >
+      </div>
     )
   }
 }

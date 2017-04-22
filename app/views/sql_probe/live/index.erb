@@ -8,13 +8,14 @@
 
 <div class='split split-horizontal split-a'>
   <div class='split split-vertical split-c'>
-    <%= react_component 'RequestTimeline' %>
+    <%= react_component 'RequestTimeline', {}, class: 'full-size' %>
   </div>
   <div class='split split-vertical split-d table-responsive'>
-    <%= react_component 'RequestTable' %>
+    <%= react_component 'RequestTable', {}, class: 'full-size' %>
   </div>
 </div>
 <div class='split split-horizontal split-b'>
+  <%= react_component 'SqlTimeline', {}, class:'full-size' %>
 </div>
 
 <% content_for :javascript do %>

@@ -76,8 +76,7 @@ html, body {
 .split-last {
 }
 
-[data-react-class=Live],
-#live-timeline {
+.full-size {
   height: 100%;
   width: 100%;
 }
