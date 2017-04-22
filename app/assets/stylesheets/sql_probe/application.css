@@ -52,15 +52,15 @@ html, body {
 
 .gutter-horizontal {
   cursor: col-resize;
-  border-right: 1px solid #ddd;
-  background: #ccc;
   border-left: 1px solid #bbb;
+  background: #ddd;
+  border-right: 1px solid #efefef;
 }
 .gutter-vertical {
   cursor: row-resize;
-  border-top: 1px solid #ddd;
-  background: #ccc;
-  border-bottom: 1px solid #bbb;
+  border-top: 1px solid #bbb;
+  background: #ddd;
+  border-right: 1px solid #efefef;
 }
 
 .split {
@@ -80,4 +80,17 @@ html, body {
 #live-timeline {
   height: 100%;
   width: 100%;
+}
+
+.request-table th:nth-child(1) {
+  width: 100%;
+}
+.request-table th:nth-child(2),
+.request-table th:nth-child(3),
+.request-table th:nth-child(4),
+.request-table td:nth-child(2),
+.request-table td:nth-child(3),
+.request-table td:nth-child(4) {
+  white-space: nowrap;
+  text-align: right;
 }

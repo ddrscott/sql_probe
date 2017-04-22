@@ -23,7 +23,18 @@ module SqlProbe
     end
 
     def live_feed_ws_url
-      live_feed_url({}, {only_path: false}).gsub(/^http/,'ws')
+      live_feed_url({}, only_path: false).gsub(/^http/, 'ws')
+    end
+
+    # This will get added to the head of every page before any other script
+    # tags are loaded.
+    # @see ./app/views/layouts/sql_probe/sql_probe.html.erb
+    def javascript_global_config
+      {
+        development: Rails.env.development?,
+        liveFeedWsUrl: live_feed_ws_url,
+        eventPath: event_path(path: 'PATH')
+      }
     end
   end
 end

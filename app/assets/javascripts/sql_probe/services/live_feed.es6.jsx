@@ -11,6 +11,7 @@ const LiveFeed = {
           var json = JSON.parse(event.data),
               event = new CustomEvent('sql_probe.data', {detail: json});
           document.dispatchEvent(event);
+          console.table(json);
         } catch(err) {
           console.error(err);
           console.error('ignoring message: ', event.data);

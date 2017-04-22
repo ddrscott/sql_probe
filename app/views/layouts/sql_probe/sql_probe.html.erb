@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <title>SQL Probe</title>
+  <script>window.SqlProbe = <%= raw javascript_global_config.to_json %></script>
   <%= stylesheet_link_tag    "sql_probe/application", media: "all" %>
 
   <%= csrf_meta_tags %>

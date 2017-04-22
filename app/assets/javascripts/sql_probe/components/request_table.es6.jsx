@@ -3,7 +3,7 @@ class RequestTable extends React.Component {
     super(props);
     LiveFeed.onMessage(json => {
       this.setState(prevState => ({
-        rows: this.state.rows.concat([json])
+        rows: [json].concat(this.state.rows)
       }));
     })
     this.state = {
@@ -11,26 +11,40 @@ class RequestTable extends React.Component {
     };
   }
 
+  renderDate(number) {
+    return new Date(number).toString().split(" ")[4]
+  }
+
   renderRows() {
     return this.state.rows.map((row) =>
       <tr key={row.start_time}>
         <td>{ row.name }</td>
-        <td>{ row.start_time }</td>
-        <td>{ row.duration }</td>
+        <td>{ this.renderDate(row.start_time * 1000) }</td>
+        <td>{ Math.round(row.duration) }</td>
         <td>{ row.events.length }</td>
       </tr>
     );
   }
 
+  totalQueries() {
+    return this.state.rows.reduce((acc, r) => (acc + r.events.length), 0)
+  }
+
+  totalDuration() {
+    return Math.round(
+      this.state.rows.reduce((acc, r) => (acc + r.duration), 0)
+    )
+  }
+
   render() {
     return (
-      <table className="table table-compressed">
+      <table className="table request-table table-condensed table-hover">
         <thead>
           <tr>
-            <th>Name</th>
+            <th>Event ({ this.state.rows.length })</th>
             <th>Start</th>
-            <th>Duration</th>
-            <th>Queries</th>
+            <th>Millis ({ this.totalDuration() })</th>
+            <th>Queries ({ this.totalQueries() })</th>
           </tr>
         </thead>
         <tbody>

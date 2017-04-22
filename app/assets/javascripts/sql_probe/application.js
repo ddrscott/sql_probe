@@ -15,3 +15,12 @@ $(document).ready(function(){
     ReactDOM.render(React.createElement(eval($elm.data('react-class')), eval($elm.data('react-props'))), elm);
   });
 });
+
+/**
+ * Disable debug logging in production.
+ */
+if (!SqlProbe.development) {
+  console.debug = function() {
+    // eat it!
+  }
+}

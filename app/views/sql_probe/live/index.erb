@@ -20,10 +20,6 @@
 <% content_for :javascript do %>
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
-window.SQL_PROBE_CONFIG = <%= raw({ live_feed_path: live_feed_path,
-                                    event_path: event_path(path: 'PATH')
-                                  }.to_json) %>
-
 Split(['.split-a', '.split-b'], {
   sizes: [50,50],
   gutterSize: 3,
@@ -42,7 +38,7 @@ Split(['.split-c', '.split-d'], {
   }
 })
 
-LiveFeed.start(<%= raw live_feed_ws_url.to_json %>);
+LiveFeed.start(SqlProbe.liveFeedWsUrl);
   </script>
 <% end %>
 
