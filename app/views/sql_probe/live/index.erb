@@ -1,25 +1,61 @@
+
 <%= content_for :head do %>
   <style>
-  body {
-    padding-top: 51px;
-  }
+body {
+  padding-top: 0;
+}
   </style>
+  <% @disable_top_navbar = true %>
 <% end %>
 
-<div class='split split-horizontal split-a'>
-  <div class='split split-vertical split-c'>
-    <%= react_component 'RequestTimeline', {}, class: 'full-size' %>
-  </div>
-  <div class='split split-vertical split-d table-responsive'>
-    <%= react_component 'RequestTable', {}, class: 'full-size' %>
+<div class='split split-horizontal split-a text-smallest'>
+  <div class='split-with-heading'>
+    <div class='split-head'>
+      <div class='split-head-buttons pull-right'>
+        <%# <button class='btn btn-xs'>Clear</button> %>
+      </div>
+      <h3>Request Timeline <small>(select timeline block or row to load right split)</small></h3>
+    </div>
+    <div class='split-body'>
+      <div class='split split-vertical split-c'>
+        <%= react_component 'RequestTimeline', {}, class: 'full-size' %>
+      </div>
+      <div class='split split-vertical split-d table-responsive'>
+        <%= react_component 'RequestTable', {}, class: 'full-size' %>
+      </div>
+    </div>
   </div>
 </div>
-<div class='split split-horizontal split-b'>
-  <%= react_component 'SqlTimeline', {}, class:'full-size' %>
+<div class='split split-horizontal split-b text-smallest'>
+  <div class='split-with-heading'>
+    <div class='split-head'>
+      <div class='split-head-buttons pull-left'>
+      </div>
+      <h3 class='text-right'>SQL Timeline</h3>
+    </div>
+    <div class='split-body'>
+      <div class='split split-vertical split-e'>
+        <%= react_component 'SqlTimeline', {}, class:'full-size' %>
+      </div>
+      <div class='split split-vertical split-f'>
+        <div class='split-with-heading'>
+          <div class='split-head'>
+            <div class="btn-group btn-group-xs" role="group" aria-label="...">
+              <button type="button" class="btn btn-default">Left</button>
+              <button type="button" class="btn btn-default">Middle</button>
+              <button type="button" class="btn btn-default">Right</button>
+            </div>
+          </div>
+          <div class='split-body'>
+            BODY
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <% content_for :javascript do %>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <script>
 Split(['.split-a', '.split-b'], {
   sizes: [50,50],
@@ -39,7 +75,18 @@ Split(['.split-c', '.split-d'], {
   }
 })
 
+Split(['.split-e', '.split-f'], {
+  sizes: [50,50],
+  direction: 'vertical',
+  gutterSize: 3,
+  cursor: 'row-resize',
+  onDrag: function() {
+    document.dispatchEvent(new Event('split.resize'));
+  }
+})
+
 LiveFeed.start(SqlProbe.liveFeedWsUrl);
   </script>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
 <% end %>
 

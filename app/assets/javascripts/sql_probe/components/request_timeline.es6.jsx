@@ -42,9 +42,11 @@ class RequestTimeline extends React.Component {
       var options = {
         height: $(container).parent().height(), 
         width: $(container).parent().width(), 
-        timeline: {
-          rowLabelStyle: { fontSize: 12, padding: 0 }
-        }
+        fontSize: 9,
+        padding: 0,
+        // timeline: {
+        //   rowLabelStyle: { fontSize: 9, padding: 0}
+        // }
       };
       google.visualization.events.addListener(timeline, 'select', () => {
         var row = timeline.getSelection()[0].row;

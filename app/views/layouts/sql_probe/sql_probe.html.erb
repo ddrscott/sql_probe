@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<%= render 'layouts/sql_probe/navbar' %>
+<%= render 'layouts/sql_probe/navbar' unless @disable_top_navbar %>
 
 <%= yield %>
 

@@ -27,6 +27,10 @@ html, body {
   height: 100%;
 }
 
+.text-smallest {
+  font-size: .75em;
+}
+
 .text-pre {
   font-size: .9em;
   font-family: monospace;
@@ -44,6 +48,42 @@ html, body {
   height: 100%;
 }
 
+.split-with-heading {
+  position: relative;
+  height: 100%;
+}
+.split-head {
+  background: #666;
+  border-bottom: 1px solid #aaa;
+  padding: 0.125em;
+}
+.split-head h3 {
+  padding: 0 1em;
+  margin: 0;
+  font-size: 1em;
+  line-height: 2em;
+  font-weight: bold;
+  color: #ddd;
+}
+.split-head h3 small {
+  font-size: .8em;
+  color: #aaa;
+}
+.split-head-buttons {
+  padding: 0.25em 1em;
+}
+.split-head .btn.btn-xs,
+.split-head .btn-group-xs > .btn {
+  font-size: 11px;
+}
+.split-body {
+  position: absolute;
+  top: 2.5em;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
 .split-horizontal,
 .gutter-horizontal {
   float: left;
@@ -52,28 +92,15 @@ html, body {
 
 .gutter-horizontal {
   cursor: col-resize;
-  border-left: 1px solid #bbb;
-  background: #ddd;
-  border-right: 1px solid #efefef;
+  background: #666;
 }
 .gutter-vertical {
   cursor: row-resize;
-  border-top: 1px solid #bbb;
-  background: #ddd;
-  border-right: 1px solid #efefef;
+  background: #666;
 }
 
 .split {
   overflow: scroll;
-}
-.split-d {
-  /* box-shadow: inset 0 2px 2px #888; */
-}
-
-.split-first {
-}
-
-.split-last {
 }
 
 .full-size {

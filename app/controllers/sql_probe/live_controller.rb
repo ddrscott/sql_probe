@@ -15,12 +15,18 @@ module SqlProbe
 
         client.onopen do
           client.send_data 'Connected'
+          send_recent_files(client, params[:preload].to_i) if params[:preload]
         end
 
         client.onclose do
           ActiveSupport::Notifications.unsubscribe(client.instance_variable_get(:@sql_probe_subscription))
         end
       end
+    end
+
+    def send_recent_files(client, max)
+      recent = SqlProbe.output_files.sort_by { |f| File.mtime(f) }.reverse[0..max]
+      recent.each { |f| client.send_data(YAML.load_file(f).to_json) }
     end
   end
 end

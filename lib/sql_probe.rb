@@ -32,6 +32,10 @@ module SqlProbe
     FileUtils.rm_rf(output_base_dir)
   end
 
+  def self.output_files
+    Dir["#{SqlProbe.output_base_dir}/**/*.yml"]
+  end
+
   def self.generate_stats
     {
 
