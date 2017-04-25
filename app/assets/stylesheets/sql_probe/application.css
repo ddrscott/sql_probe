@@ -108,15 +108,25 @@ html, body {
   width: 100%;
 }
 
-.request-table th:nth-child(1) {
-  width: 100%;
-}
-.request-table th:nth-child(2),
-.request-table th:nth-child(3),
-.request-table th:nth-child(4),
-.request-table td:nth-child(2),
-.request-table td:nth-child(3),
-.request-table td:nth-child(4) {
+.backtrace-table th,
+.backtrace-table td {
   white-space: nowrap;
+}
+
+.backtrace-table th:nth-child(1),
+.backtrace-table th:nth-child(2),
+.backtrace-table th:nth-child(3),
+.backtrace-table td:nth-child(1),
+.backtrace-table td:nth-child(2),
+.backtrace-table td:nth-child(3) {
   text-align: right;
+}
+
+.table-hover tbody tr {
+  cursor: pointer;
+}
+
+
+.animate {
+  transition: all .2s ease
 }

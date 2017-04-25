@@ -32,8 +32,9 @@ module SqlProbe
     def javascript_global_config
       {
         development: Rails.env.development?,
+        railsRoot: Rails.root.to_s,
         liveFeedWsUrl: live_feed_ws_url,
-        eventPath: event_path(path: 'PATH')
+        eventPath: event_path(path: 'PATH'),
       }
     end
   end

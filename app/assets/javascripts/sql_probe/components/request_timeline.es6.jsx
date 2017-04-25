@@ -28,6 +28,10 @@ class RequestTimeline extends React.Component {
   }
 
   initChart() {
+    if (typeof google == 'undefined') {
+      console.error('Could not load `google`. Make sure you are online.')
+      return;
+    }
     google.charts.load('current', {'packages':['timeline']});
     google.charts.setOnLoadCallback(() => {
       var container = this.timelineElm;

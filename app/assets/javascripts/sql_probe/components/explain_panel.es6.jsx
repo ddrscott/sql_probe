@@ -1,4 +1,4 @@
-class StatementTab extends React.Component {
+class ExplainPanel extends React.Component {
 
   constructor(props) {
     super(props);
@@ -41,14 +41,9 @@ class StatementTab extends React.Component {
 
 
   componentDidMount() {
-
     document.addEventListener('sql_probe.selected.sql.event', (event) => {
       this.setState(event.detail);
-      console.log(event.detail);
-      this.updateEditor();
     }, false);
-
-    this.updateEditor();
   }
 
   componentWillUnmount() {
@@ -67,11 +62,8 @@ class StatementTab extends React.Component {
   }
 
   render() {
-    if (this.state.sql == undefined) {
-      return <div>Select a statement to see it here</div> 
-    }
     return (
-      <div className='full-size' ref={(elm) => {this.refEditor = elm}} />
+      <div className='full-size' ref={(elm) => {this.refEditor = elm}}>Explain Panel</div>
     )
   }
 }
