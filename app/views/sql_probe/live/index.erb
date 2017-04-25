@@ -27,32 +27,7 @@ body {
   </div>
 </div>
 <div class='split split-horizontal split-b text-smallest'>
-  <div class='split-with-heading'>
-    <div class='split-head'>
-      <div class='split-head-buttons pull-left'>
-      </div>
-      <h3 class='text-right'>SQL Timeline</h3>
-    </div>
-    <div class='split-body'>
-      <div class='split split-vertical split-e'>
-        <%= react_component 'SqlTimeline', {}, class:'full-size' %>
-      </div>
-      <div class='split split-vertical split-f'>
-        <div class='split-with-heading'>
-          <div class='split-head'>
-            <div class="btn-group btn-group-xs" role="group" aria-label="...">
-              <button type="button" class="btn btn-default">Left</button>
-              <button type="button" class="btn btn-default">Middle</button>
-              <button type="button" class="btn btn-default">Right</button>
-            </div>
-          </div>
-          <div class='split-body'>
-            BODY
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <%= react_component 'SqlTimeline', {}, class:'full-size' %>
 </div>
 
 <% content_for :javascript do %>
@@ -75,15 +50,6 @@ Split(['.split-c', '.split-d'], {
   }
 })
 
-Split(['.split-e', '.split-f'], {
-  sizes: [50,50],
-  direction: 'vertical',
-  gutterSize: 3,
-  cursor: 'row-resize',
-  onDrag: function() {
-    document.dispatchEvent(new Event('split.resize'));
-  }
-})
 
 LiveFeed.start(SqlProbe.liveFeedWsUrl);
   </script>

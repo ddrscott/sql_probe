@@ -9,7 +9,16 @@ class SqlTimeline extends React.Component {
     }, false);
 
     this.state = {
-      events: []
+      events: [],
+      selectedTab: 'sql'
+    };
+  }
+
+  tabs() {
+    return {
+      sql: (<StatementTab />),
+      explain: 'explain coming soon',
+      backtrace: 'backtrace comming soon'
     };
   }
 
@@ -18,6 +27,16 @@ class SqlTimeline extends React.Component {
     // resize chart as needed
     window.addEventListener("resize", () => this.drawChart());
     document.addEventListener('split.resize', () => this.drawChart());
+
+    Split(['.split-e', '.split-f'], {
+      sizes: [50,50],
+      direction: 'vertical',
+      gutterSize: 3,
+      cursor: 'row-resize',
+      onDrag: function() {
+        document.dispatchEvent(new Event('split.resize'));
+      }
+    })
   }
 
   initChart() {
@@ -39,10 +58,11 @@ class SqlTimeline extends React.Component {
           rowLabelStyle: { fontSize: 12, padding: 0 }
         }
       };
-      google.visualization.events.addListener(timeline, 'select', function() {
-        var row = timeline.getSelection()[0].row;
-        console.log('selected: ', row);
-        // EventDetailDialog.show(sqlEventData[row]);
+      google.visualization.events.addListener(timeline, 'select', () => {
+        const row = timeline.getSelection()[0].row;
+        const {events} = this.state;
+        const event = events[row];
+        document.dispatchEvent(new CustomEvent('sql_probe.selected.sql.event', {detail: event}));
       });
       this.setState({
         timeline:  timeline,
@@ -75,9 +95,58 @@ class SqlTimeline extends React.Component {
     }
   }
 
+  handleTabSelection(tab) {
+    this.setState({
+      selectedTab: tab
+    })
+  }
+
+  renderTab() {
+    const tab = this.state.selectedTab;
+    return this.tabs()[tab]
+  }
+
+  renderTabButtons(){
+    return Object.keys(this.tabs()).map( tab => {
+      return (
+        <button
+          type="button"
+          key={tab}
+          onClick={() => {this.handleTabSelection(tab)}}
+          className={"btn btn-default " + (this.state.selectedTab == tab ? 'active' : '')}
+        >
+          {tab}
+        </button>
+      )
+    });
+  }
+
   render() {
     return (
-      <div ref={(elm) => { this.timelineElm = elm }} >
+      <div className='split-with-heading'>
+        <div className='split-head'>
+          <div className='split-head-buttons pull-left'>
+            (buttons)
+          </div>
+          <h3 className='text-right'>SQL Timeline</h3>
+        </div>
+        <div className='split-body'>
+          <div className='split split-vertical split-e'>
+            <div ref={(elm) => { this.timelineElm = elm }} />
+          </div>
+          <div className='split split-vertical split-f'>
+            <div className='split-with-heading'>
+              <div className='split-head'>
+                <div className="btn-group btn-group-xs" role="group" aria-label="...">
+                  {this.renderTabButtons()}
+                </div>
+              </div>
+              <div className='split-body'>
+                {this.renderTab()}
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     )
   }
