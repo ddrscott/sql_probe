@@ -63,7 +63,7 @@ class StatementTab extends React.Component {
     editor.setReadOnly(true);
     const {sql, binds, elapsed} = this.state;
     const bindComment = binds ? `-- binds: \n` + binds.map( (bind, i) => `--   $${i+1}: ${bind.value}\n` ).join('') : ''
-    editor.setValue(`-- elapsed: ${elapsed}\n${bindComment}${sql}`);
+    editor.setValue(`-- elapsed: ${elapsed}\n${bindComment}${sql}`, -1);
   }
 
   render() {

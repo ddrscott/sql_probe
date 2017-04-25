@@ -54,6 +54,9 @@ class SqlTimeline extends React.Component {
         height: $(container).parent().height(), 
         width: $(container).parent().width(), 
         // backgroundColor: 'transparent',
+        tooltip: {
+          trigger: 'none'
+        },
         timeline: {
           rowLabelStyle: { fontSize: 12, padding: 0 }
         }
