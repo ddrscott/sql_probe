@@ -2,6 +2,9 @@
 //= require bootstrap-3.3.7
 //= require split-1.2.0
 //= require ace-1.2.6
+//= require mode-ruby
+//= require mode-sql
+//= require mode-yaml
 //= require react
 //= require react_ujs
 //= require_tree ./services
