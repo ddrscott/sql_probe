@@ -53,7 +53,7 @@ class RequestTable extends React.Component {
 
   render() {
     return (
-      <table className="table request-table table-condensed table-hover">
+      <table className={`table request-table table-condensed table-hover ${this.props.className}`}>
         <thead>
           <tr>
             <th>Event ({ this.state.rows.length })</th>
