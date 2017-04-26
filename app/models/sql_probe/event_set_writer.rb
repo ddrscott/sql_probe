@@ -1,5 +1,5 @@
 module SqlProbe
-  module EventWriter
+  module EventSetWriter
     module_function
 
     # Helper to write out raw events to an output location

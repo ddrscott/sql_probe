@@ -23,7 +23,7 @@ module SqlProbe
         # calc the last event time
         previous.elapsed = (Time.now - previous.time) * 1000.0 if previous
 
-        EventWriter.write_to_file_system(
+        EventSetWriter.write_to_file_system(
           name: name,
           duration: ms,
           start_time: start_time,
