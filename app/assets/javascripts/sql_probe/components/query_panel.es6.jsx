@@ -4,6 +4,10 @@ class QueryPanel extends React.Component {
   }
 
   componentDidMount() {
+    this.componentDidUpdate();
+  }
+
+  componentDidUpdate() {
     const editor = ace.edit(this.refEditor);
     // Automatically scrolling cursor into view after selection change this will be disabled in the next version
     editor.$blockScrolling = Infinity;
@@ -15,6 +19,6 @@ class QueryPanel extends React.Component {
   }
 
   render() {
-    return <div className={this.props.className} ref={(elm) => this.refEditor = elm}>{this.props.sql}</div>
+    return <div className={this.props.className} ref={(elm) => this.refEditor = elm}></div>
   }
 }
