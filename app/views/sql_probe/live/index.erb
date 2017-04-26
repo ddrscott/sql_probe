@@ -9,20 +9,7 @@ body {
 <% end %>
 
 <div class='split split-horizontal split-a text-smallest'>
-  <div class='split split-vertical split-aa split-panel'>
-    <div class='split-head'>
-      <div class='split-head-buttons pull-right'>
-        <%# <button class='btn btn-xs'>Clear</button> %>
-      </div>
-      <h3>Request Timeline <small>(select timeline block or row to load right split)</small></h3>
-    </div>
-    <div class='split-body' style='overflow: hidden'>
-      <%= react_component 'RequestTimeline', {}, class: 'full-size' %>
-    </div>
-  </div>
-  <div class='split split-vertical split-ab table-responsive'>
-    <%= react_component 'RequestTable', {}, class: 'full-size' %>
-  </div>
+  <%= react_component 'RequestPanel', {}, class: 'full-size' %>
 </div>
 <div class='split split-horizontal split-b text-smallest'>
   <%= react_component 'SqlTimeline', {}, class: 'full-size' %>
@@ -38,16 +25,6 @@ Split(['.split-a', '.split-b'], {
     document.dispatchEvent(new Event('split.resize'));
   }
 })
-Split(['.split-aa', '.split-ab'], {
-  sizes: [50,50],
-  direction: 'vertical',
-  gutterSize: 3,
-  cursor: 'row-resize',
-  onDrag: function() {
-    document.dispatchEvent(new Event('split.resize'));
-  }
-})
-
 
 LiveFeed.start(SqlProbe.liveFeedWsUrl);
   </script>
