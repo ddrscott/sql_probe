@@ -12,5 +12,9 @@ module SqlProbe
       @caller = Utils.reject_gem_paths(Kernel.caller)
                      .reject { |r| r =~ %r{/app/.*/sql_probe/} } # omit ourselves
     end
+
+    def [](key)
+      payload[key] || payload[key.to_sym]
+    end
   end
 end
