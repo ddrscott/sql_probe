@@ -7,7 +7,7 @@
   <title>SQL Probe</title>
   <script>window.SqlProbe = <%= raw javascript_global_config.to_json %></script>
   <%= stylesheet_link_tag    "sql_probe/application", media: "all" %>
-
+  <%= javascript_include_tag "sql_probe/application" %>
   <%= csrf_meta_tags %>
   <%= yield :head %>
 </head>
@@ -17,7 +17,6 @@
 
 <%= yield %>
 
-<%= javascript_include_tag "sql_probe/application" %>
 <%= yield :javascript %>
 <%= render 'layouts/sql_probe/ga' if Rails.env.production? %>
 </body>

@@ -48,9 +48,12 @@ html, body {
   height: 100%;
 }
 
-.split-with-heading {
-  position: relative;
+.split-with-heading,
+.split-panel {
   height: 100%;
+  display: flex;
+  flex-flow: column;
+  overflow: hidden;
 }
 .split-head {
   background: #666;
@@ -77,11 +80,8 @@ html, body {
   font-size: 11px;
 }
 .split-body {
-  position: absolute;
-  top: 2.5em;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  flex: 1;
+  overflow: scroll;
 }
 
 .split-horizontal,
@@ -104,6 +104,7 @@ html, body {
 }
 
 .full-size {
+  position: relative;
   height: 100%;
   width: 100%;
 }

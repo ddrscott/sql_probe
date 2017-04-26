@@ -149,29 +149,28 @@ class SqlTimeline extends React.Component {
       </button>
     );
     return (
-      <div className='split-with-heading'>
-        <div className='split-head'>
-          <div className='split-head-buttons pull-left'>
-            (buttons)
-          </div>
-          <h3 className='text-right'>SQL Timeline</h3>
-        </div>
-        <div className='split-body'>
-          <div className='split split-vertical split-sql-timeline-a'>
-            <div ref={(elm) => { this.timelineElm = elm }} />
-          </div>
-          <div className='split split-vertical split-sql-timeline-b'>
-            <div className='split-with-heading'>
-              <div className='split-head'>
-                <div className="btn-group btn-group-xs" role="group" aria-label="...">
-                  { ['sql', 'backtrace'].map(button) }
-                </div>
-              </div>
-              <div className='split-body'>
-                { selectedTab == 'sql' ? <QueryPanel className='full-size' {...this.state.selectedEvent} /> : null }
-                { selectedTab == 'backtrace' ? <BacktracePanel className='full-size' {...this.state.selectedEvent} /> : null }
-              </div>
+      <div className={'full-size'} >
+        <div className='split split-vertical split-sql-timeline-a split-panel'>
+          <div className='split-head'>
+            <div className='split-head-buttons pull-left'>
+              (buttons)
             </div>
+            <h3 className='text-right'>SQL Timeline</h3>
+          </div>
+          <div className='split-body'>
+            <div ref={(elm) => { this.timelineElm = elm }}></div>
+          </div>
+        </div>
+
+        <div className='split split-vertical split-sql-timeline-b split-panel'>
+          <div className='split-head'>
+            <div className="btn-group btn-group-xs" role="group" aria-label="...">
+              { ['sql', 'backtrace'].map(button) }
+            </div>
+          </div>
+          <div className='split-body'>
+            { selectedTab == 'sql' ? <QueryPanel className='full-size' {...this.state.selectedEvent} /> : null }
+            { selectedTab == 'backtrace' ? <BacktracePanel className='full-size' {...this.state.selectedEvent} /> : null }
           </div>
         </div>
       </div>
