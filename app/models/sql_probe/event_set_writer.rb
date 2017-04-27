@@ -17,17 +17,19 @@ module SqlProbe
       full_path = File.join(output_dir, "#{file_id}.yml")
 
       # write contents
-      result = File.open(full_path, 'w') do |file|
-        file << {
-          'name' => name,
-          'start_time' => start_time,
-          'duration' => duration,
-          'params' => params,
-          'events' => events
-        }.to_yaml(line_width: -1)
-      end
-      ActiveSupport::Notifications.instrument 'sql_probe.file', path: full_path
-      result
+      event_group = {
+        'id' => Digest::MD5.hexdigest(full_path),
+        'name' => name,
+        'start_time' => start_time,
+        'duration' => duration,
+        'params' => params,
+        'events' => events
+      }.to_yaml(line_width: -1)
+      return false unless event_group
+
+      File
+        .open(full_path, 'w') { |file| file << event_group }
+        .tap { ActiveSupport::Notifications.instrument 'sql_probe.file', path: full_path }
     end
 
     def flatten_event_payload(event)
