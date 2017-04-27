@@ -1,0 +1,55 @@
+<div class='container-fluid'>
+  <div class='well'>
+    <h1>Test site</h1>
+    <p>
+    This is good for single page apps, but probably doesn't make sense for sites with
+    a lot of refreshes.
+    </p>
+  </div>
+</div>
+<% content_for :javascript do %>
+  <style>
+#sql_probe-probelet {
+  position: absolute;
+  z-index: 10;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 400px;
+}
+.sql_probe-probelet-iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-top: 1px solid #333;
+  box-shadow: 0px 0px 15px -5px rgba(0,0,0,0.8);
+}
+.sql_probe-probelet-closer {
+  float: right;
+  margin-top: -30px;
+  margin-bottom: 0;
+}
+  </style>
+  <script>
+$(document).ready(function(){
+  if ($('#sql_probe-probelet').length == 0) {
+    window.SqlProbeProbelet = {
+      close: function() {
+        $('#sql_probe-probelet').remove();
+      },
+      mount: function() {
+        var $iframe = $('<iframe class="sql_probe-probelet-iframe">')
+          .attr('src', '/sql_probe/live');
+        var $closer = $('<button class="sql_probe-probelet-closer">')
+          .attr('onclick', 'SqlProbeProbelet.close()')
+          .text('Close Probelet');
+        var $probelet = $('<div id="sql_probe-probelet">').append($closer).append($iframe);
+        $('body').append($probelet);
+      }
+    };
+    SqlProbeProbelet.mount();
+  }
+})
+  </script>
+<% end %>

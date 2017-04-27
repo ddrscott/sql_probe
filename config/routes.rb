@@ -18,4 +18,7 @@ SqlProbe::Engine.routes.draw do
   get 'event_sets/:id/:event_id(.:format)', to: 'event_sets#event'
   get 'event_sets/:id(.:format)', to: 'event_sets#show'
   get 'event_sets(.:format)', to: 'event_sets#index'
+
+
+  get 'probelet/test', to: 'probelet#index'
 end
