@@ -7,6 +7,7 @@ module SqlProbe
     end
 
     def feed
+      SqlProbe.listening = true
       hijack do |client|
         subscription = ActiveSupport::Notifications.subscribe('sql_probe.file') do |name, started, finished, unique_id, data|
           client.send_data(YAML.load_file(data[:path]).merge(path: data[:path]).to_json)
