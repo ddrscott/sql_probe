@@ -1,11 +1,13 @@
 module SqlProbe
   # Adds caller attribute to Instrumented Event
   class EventWithCaller < ActiveSupport::Notifications::Event
+    attr_reader :type
     attr_reader :caller
     attr_accessor :elapsed
 
-    def initialize(*args)
-      super
+    def initialize(type, *args)
+      super(*args)
+      @type = type
       # force duration calculation
       self.duration
       # set caller backtrace

@@ -25,7 +25,7 @@ module SqlProbe
         mtime:  File.mtime(path),
         name:   yaml['name'],
         duration:   yaml['duration'] || -1.0,
-        tables: event.nil? ? [] : table_summary(event['sql'])
+        tables: event.nil? ? {} : table_summary(event['sql'])
       }
     end
 
@@ -37,6 +37,8 @@ module SqlProbe
 
     # @return [Hash<String,String>] table_name => action (SELECT|INSERT|UPDATE|DELETE)
     def table_summary(sql)
+      return {} unless sql
+
       ins = Inspector.new(sql)
       action = ins.action
       ins.action_tables.each_with_object({}) do |table, agg|

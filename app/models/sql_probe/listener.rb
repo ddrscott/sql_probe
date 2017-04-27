@@ -8,13 +8,18 @@ module SqlProbe
       events = []
       previous = nil
       event = nil
-      subscription_name = ActiveSupport::Notifications.subscribe('sql.active_record') do |*args|
-        event = EventWithCaller.new(*args)
+
+      recorder = lambda do |type, args|
+        event = EventWithCaller.new(type, *args)
 
         # calculate elapsed time
         previous.elapsed = (event.time - previous.time) * 1000.0 if previous
         previous = event
         events << event
+      end
+
+      subscriptions = %w(instantiation.active_record sql.active_record).map do |type|
+        ActiveSupport::Notifications.subscribe(type) { |*args| recorder[type, args] }
       end
 
       begin
@@ -32,7 +37,7 @@ module SqlProbe
           output_base_path: SqlProbe.output_base_dir
         )
       ensure
-        ActiveSupport::Notifications.unsubscribe(subscription_name)
+        subscriptions.each { |sub| ActiveSupport::Notifications.unsubscribe(sub) }
       end
     end
   end

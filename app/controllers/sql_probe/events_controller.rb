@@ -10,9 +10,8 @@ module SqlProbe
     end
 
     def build_timeline_data(events)
-      base = 0.0
-      @event['events'].map do |event|
-        [event['sql'], base, (base += (event['elapsed']))]
+      events.map do |event|
+        [event['sql'] || event['class_name'], Time.parse(event['time']).to_f * 1000, Time.parse(event['end']).to_f * 1000]
       end
     end
 
