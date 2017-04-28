@@ -20,5 +20,6 @@ group :development, :test do
   gem 'guard-rspec', require: false
   gem 'rspec-rails', '~> 3.5.0'
   gem 'pry'
+  gem 'puma', '~> 3.0'
 end
 
