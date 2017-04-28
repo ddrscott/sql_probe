@@ -1,0 +1,42 @@
+.PanelSplit {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  position: absolute;
+}
+
+.PanelSplit-resizer {
+  height: 1px;
+  background: #AAA;
+  cursor: ns-resize;
+  position: relative;
+}
+
+.PanelSplit-resizer::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  right: -3px;
+  left: -3px;
+  z-index: 999;
+  background: rgba(255,255,255,0.1);
+}
+
+.PanelSplit-resizer--horizontal {
+  height: 100%;
+  width: 1px;
+  position: relative;
+  cursor: ew-resize;
+}
+
+.PanelSplit-a,
+.PanelSplit-b {
+  overflow: hidden;
+}
+
+.PanelSplit-b {
+  flex-grow: 1;
+  position: relative;
+  overflow: hidden;
+}

@@ -12,6 +12,7 @@ SqlProbe::Engine.routes.draw do
 
   get 'live/feed', to: 'live#feed', as: :live_feed
   get 'live', to: 'live#index', as: :live
+  get 'live/main', to: 'live#main'
 
   get 'event_sets/:id/:event_id/explain(.:format)', to: 'event_sets#explain'
   get 'event_sets/:id/:event_id/execute(.:format)', to: 'event_sets#execute'
