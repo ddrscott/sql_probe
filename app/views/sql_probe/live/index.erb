@@ -1,4 +1,3 @@
-
 <%= content_for :head do %>
   <style>
 body {
@@ -7,27 +6,4 @@ body {
   </style>
   <% @disable_top_navbar = true %>
 <% end %>
-
-<div class='split split-horizontal split-a text-smallest'>
-  <%= react_component 'RequestPanel', {}, class: 'full-size' %>
-</div>
-<div class='split split-horizontal split-b text-smallest'>
-  <%= react_component 'SqlTimeline', {}, class: 'full-size' %>
-</div>
-
-<% content_for :javascript do %>
-  <script>
-Split(['.split-a', '.split-b'], {
-  sizes: [50, 50],
-  gutterSize: 3,
-  cursor: 'col-resize',
-  onDrag: function() {
-    document.dispatchEvent(new Event('split.resize'));
-  }
-})
-
-LiveFeed.start(SqlProbe.liveFeedWsUrl);
-  </script>
-  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-<% end %>
-
+<div id='root'></div>
