@@ -6,7 +6,7 @@ Web frontend for visualzing the SQL trace data collected by [SQL Probe](https://
 
     > foreman start
 
-In a browser go to http://localhost:3000/
+In a browser go to http://localhost:3002/
 
 ### How this works?
 

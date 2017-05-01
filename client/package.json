@@ -16,12 +16,13 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build; yarn run build-rename-css; yarn run build-rename-js; yarn run build-remove-maps; yarn run build-update-index",
+    "build": "react-scripts build; yarn build-rename-css; yarn build-rename-js; yarn build-remove-maps; yarn build-update-index; yarn build-update-asset-manifest",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
     "build-rename-css": "mv build/static/css/main.*.css build/main.css",
     "build-rename-js": "mv build/static/js/main.*.js build/main.js",
     "build-remove-maps": "rm build/static/js/*.map build/static/css/*.map",
-    "build-update-index": "sed -i -- 's/\\/static\\/js\\/.*.js/main.js/g' ./build/index.html; sed -i -- 's/\\/static\\/css\\/.*.css/main.css/g' ./build/index.html; rm ./build/index.html--"
+    "build-update-index": "sed -i -- 's/\\/static\\/js\\/.*.js/main.js/g' ./build/index.html; sed -i -- 's/\\/static\\/css\\/.*.css/main.css/g' ./build/index.html; rm ./build/index.html--",
+    "build-update-asset-manifest": "sed -i -- 's/static\\/js\\/.*.js/main.js/g' ./build/asset-manifest.json; sed -i -- 's/static\\/css\\/.*.css/main.css/g' ./build/asset-manifest.json; rm ./build/asset-manifest.json--"
   }
 }
