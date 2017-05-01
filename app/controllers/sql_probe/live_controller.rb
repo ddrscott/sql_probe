@@ -11,8 +11,8 @@ module SqlProbe
 
     def main
       respond_to do |format|
-        format.js  { render file: SqlProbe::Engine.root.join('client', 'build', 'main.js') }
-        format.css  { render file: SqlProbe::Engine.root.join('client', 'build', 'main.css') }
+        format.js { render file: SqlProbe::Engine.root.join('client', 'build', 'main.js') }
+        format.css { render file: SqlProbe::Engine.root.join('client', 'build', 'main.css') }
       end
     end
 
