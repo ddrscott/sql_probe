@@ -34,6 +34,12 @@ export default class extends Component {
     this.timeline.setOptions({
       height: '100%',
       stack: false,
+      // sensible scrolling
+      horizontalScroll: true,
+      verticalScroll: true,
+      zoomKey: 'ctrlKey',
+      zoomMin: 1000,             // one second in millis
+      zoomMax: 1000 * 60 * 60,   // about an hour in millis
       orientation: {
         axis: 'bottom',
         item: 'top'
