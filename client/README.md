@@ -4,10 +4,7 @@ Web frontend for visualzing the SQL trace data collected by [SQL Probe](https://
 
 ## Developing
 
-    > yarn
-    > yarn start
-    > cd "where your rails app using sql_probe"
-    > bundle exec rails s -p 3002
+    > foreman start
 
 In a browser go to http://localhost:3000/
 
@@ -19,6 +16,6 @@ Browser -> Webpack Dev Server -> Rails Server
 
     > yarn build
     > cd "where your rails app using sql_probe"
-    > bundle exec rails s -p 3002
+    > bundle exec rails server
 
-In a browser go to http://localhost:3002/sql_probe/live
+In a browser go to http://localhost:3000/sql_probe/live

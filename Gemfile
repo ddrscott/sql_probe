@@ -21,4 +21,5 @@ group :development, :test do
   gem 'rspec-rails', '~> 3.5.0'
   gem 'pry'
   gem 'puma', '~> 3.0'
+  gem 'foreman'
 end

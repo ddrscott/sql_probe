@@ -2,7 +2,7 @@
   "name": "sql_probe-ui",
   "version": "0.1.0",
   "private": true,
-  "proxy": "http://localhost:3002/",
+  "proxy": "http://localhost:3000/",
   "dependencies": {
     "react": "^15.5.4",
     "react-codemirror": "^0.3.0",
