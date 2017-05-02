@@ -82,7 +82,7 @@ module SqlProbe
 
     context '#data_sources' do
       before do
-        allow(subject).to receive(:all_data_sources).and_return(
+        allow(described_class).to receive(:all_data_sources).and_return(
           %w(foo bar baz)
         )
       end
