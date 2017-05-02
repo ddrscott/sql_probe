@@ -4,7 +4,7 @@ module SqlProbe
   # Use like `Rails.root`
   # @return [Pathname]
   def self.output_base_dir
-    @output_base_dir ||= Rails.root.join('tmp/sql_probe')
+    @output_base_dir ||= Rails.root.join('tmp', 'sql_probe')
   end
 
   def self.output_base_dir=(output_path)
@@ -12,7 +12,7 @@ module SqlProbe
   end
 
   def self.listen_token_path
-    File.join("#{output_base_dir}", '.listening')
+    Rails.root.join('tmp', '.sql_probe_listening')
   end
 
   def self.listening?
