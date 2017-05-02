@@ -1,9 +1,19 @@
 module SqlProbe
   class LiveController < SqlProbe::ApplicationController
     include Tubesock::Hijack
+    skip_before_action :verify_authenticity_token, only: [ :main ]
+    layout false
 
     def index
       SqlProbe.listening = true
+      render file: SqlProbe::Engine.root.join('client', 'build', 'index.html')
+    end
+
+    def main
+      respond_to do |format|
+        format.js { render file: SqlProbe::Engine.root.join('client', 'build', 'main.js') }
+        format.css { render file: SqlProbe::Engine.root.join('client', 'build', 'main.css') }
+      end
     end
 
     def feed

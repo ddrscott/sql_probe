@@ -43,84 +43,10 @@ html, body {
 }
 
 
-[data-react-class=Splits],
-[data-react-class=Splits] > * {
-  height: 100%;
-}
-
-.split-with-heading,
-.split-panel {
-  height: 100%;
-  display: flex;
-  flex-flow: column;
-  overflow: hidden;
-}
-.split-head {
-  background: #666;
-  border-bottom: 1px solid #aaa;
-  padding: 0.125em;
-}
-.split-head h3 {
-  padding: 0 1em;
-  margin: 0;
-  font-size: 1em;
-  line-height: 2em;
-  font-weight: bold;
-  color: #ddd;
-}
-.split-head h3 small {
-  font-size: .8em;
-  color: #aaa;
-}
-.split-head-buttons {
-  padding: 0.25em 1em;
-}
-.split-head .btn.btn-xs,
-.split-head .btn-group-xs > .btn {
-  font-size: 11px;
-}
-.split-body {
-  flex: 1;
-  overflow: scroll;
-}
-
-.split-horizontal,
-.gutter-horizontal {
-  float: left;
-  height: 100%;
-}
-
-.gutter-horizontal {
-  cursor: col-resize;
-  background: #666;
-}
-.gutter-vertical {
-  cursor: row-resize;
-  background: #666;
-}
-
-.split {
-  overflow: scroll;
-}
-
 .full-size {
   position: relative;
   height: 100%;
   width: 100%;
-}
-
-.backtrace-table th,
-.backtrace-table td {
-  white-space: nowrap;
-}
-
-.backtrace-table th:nth-child(1),
-.backtrace-table th:nth-child(2),
-.backtrace-table th:nth-child(3),
-.backtrace-table td:nth-child(1),
-.backtrace-table td:nth-child(2),
-.backtrace-table td:nth-child(3) {
-  text-align: right;
 }
 
 .table-hover tbody tr {
