@@ -1,0 +1,35 @@
+---
+id: 659ab69b6784fe51d149dd2ace61f3a4
+name: homes#index
+start_time: 1493717786.656204
+duration: 19.50437900086399
+params:
+  :controller: homes
+  :action: index
+events:
+- name: Home Load
+  time: '2017-05-02T04:36:26.659-05:00'
+  transaction_id: 358af57895d9ce815661
+  end: '2017-05-02T04:36:26.659-05:00'
+  children: []
+  duration: 0.185
+  type: sql.active_record
+  caller:
+  - "./spec/dummy/app/views/homes/index.html.erb:14:in `_app_views_homes_index_html_erb__2513260380249536741_70320171970660'"
+  elapsed: 4.1770000000000005
+  sql: SELECT "homes".* FROM "homes"
+  connection_id: 70320176639400
+  statement_name: 
+  binds: []
+- name: instantiation.active_record
+  time: '2017-05-02T04:36:26.663-05:00'
+  transaction_id: baa2467424f4576ba013
+  end: '2017-05-02T04:36:26.663-05:00'
+  children: []
+  duration: 0.087
+  type: instantiation.active_record
+  caller:
+  - "./sql_probe/spec/dummy/app/views/homes/index.html.erb:14:in `_app_views_homes_index_html_erb__2513260380249536741_70320171970660'"
+  elapsed: 12.319
+  record_count: 4
+  class_name: Home

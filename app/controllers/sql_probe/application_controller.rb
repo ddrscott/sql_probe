@@ -2,6 +2,7 @@ module SqlProbe
   class ApplicationController < ActionController::Base
     layout 'sql_probe/sql_probe'
 
-    protect_from_forgery with: :exception
+    # Local app. This isn't needed
+    # protect_from_forgery with: :exception
   end
 end

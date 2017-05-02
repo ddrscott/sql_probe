@@ -1,37 +1,13 @@
 module SqlProbe
   # Manage the dashboard
-  class MainController < SqlProbe::ApplicationController
+  class PivotController < SqlProbe::ApplicationController
     def index
       @events = filter_events(StatementList.new.to_a, params_sql_filter)
       @totals = rollup_counts(@events)
       @pivot = pivot_counts(@events, @totals)
                .sort_by { |row| row[:mtime] }
                .reverse
-    end
-
-    def start
-      if SqlProbe.listening?
-        flash[:success] = 'Already listening'
-      else
-        SqlProbe.listening = true
-        flash[:success] = 'Listening enabled'
-      end
-      redirect_to :live
-    end
-
-    def stop
-      if SqlProbe.listening?
-        flash[:success] = 'Listening disabled'
-        SqlProbe.listening = false
-      else
-        flash[:success] = 'Listening already disabled'
-      end
-      redirect_to :root
-    end
-
-    def reset
-      SqlProbe.clear_output_dir
-      redirect_to :back
+      render json: @pivot
     end
 
     private

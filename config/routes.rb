@@ -1,9 +1,11 @@
 SqlProbe::Engine.routes.draw do
-  root to: 'main#index'
+  root to: 'pivot#index'
 
-  post 'start', to: 'main#start'
-  post 'stop', to: 'main#stop'
-  post 'reset', to: 'main#reset'
+  post 'listen/start', to: 'listen#start'
+  post 'listen/stop',  to: 'listen#stop'
+  post 'listen/reset', to: 'listen#reset'
+
+  get 'pivot', to: 'pivot#index'
 
   get 'event', to: 'events#show'
   get 'event/code', to: 'events#code'
