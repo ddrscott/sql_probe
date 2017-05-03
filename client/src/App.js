@@ -1,29 +1,42 @@
 import React, { Component } from 'react';
 import './App.css';
-import EventTimeline from './components/EventTimeline';
 import EventDetails from './components/EventDetails';
+import EventsSummary from './components/EventsSummary/EventsSummary';
+import EventTimeline from './components/EventTimeline';
 import PanelSplit from './components/PanelSplit';
 
 export default class extends Component {
   constructor(){
     super();
     this.handleSelect = this.handleSelect.bind(this);
+    this.handleVisibleEventsChange = this.handleVisibleEventsChange.bind(this);
     this.state = {
-      selectedEvent: undefined
+      selectedEvent: undefined,
+      visibleEvents: []
     };
   }
 
   handleSelect(selectedEvent) { this.setState({ selectedEvent }); }
+  handleVisibleEventsChange(visibleEvents) {
+    this.setState({ visibleEvents });
+  }
 
   render() {
-    const { selectedEvent } = this.state;
+    const { selectedEvent, visibleEvents } = this.state;
     return (
       <div className='App'>
         <PanelSplit
           a={height =>
-            <EventTimeline onSelect={this.handleSelect} />
+            <EventTimeline
+              onSelect={this.handleSelect}
+              onVisibleChange={this.handleVisibleEventsChange}
+            />
           }
-          b={<EventDetails event={selectedEvent} />}
+          b={
+            selectedEvent
+              ? <EventDetails event={selectedEvent} />
+              : <EventsSummary visibleEvents={visibleEvents} />
+          }
         />
       </div>
     )
