@@ -26,17 +26,20 @@ export default class extends Component {
     }
   }
 
-  fetchCode(path){
-    fetch(`/sql_probe/event/code?locator=${path}`)
-      .then(r => r.json())
-      .then(data => {
-        this.setState({ code: data.code }, () => {
-          setTimeout(() => {
-            const line = getLine(path) - 1;
-            this.comp.codeMirror.doc.setSelection({ line, ch: 0 }, { line, ch: 100000 })
-          }, 100); // TODO: figure out codemirror callback when it's done rendering/syntax highlighting
-        });
-      });
+  async fetchCode(path){
+    const response = await fetch(`/sql_probe/event/code?locator=${path}`);
+    const { code } = await response.json();
+    this.setState({ code }, () => {
+      requestAnimationFrame(() => this.scrollToLine(getLine(path) - 1));
+    });
+  }
+
+  scrollToLine(line) {
+    const { comp: { codeMirror } } = this;
+    codeMirror.setSelection({ line, ch: 0 }, { line, ch: 100000 });
+    const { offsetHeight, scrollTop } = codeMirror.getScrollerElement();
+    codeMirror.scrollTo(null, scrollTop + (offsetHeight / 2));
+    codeMirror.focus();
   }
 
   render() {
