@@ -1,0 +1,41 @@
+.Tabs {
+  height: 30px;
+  margin: 0;
+  padding: 0 20px;
+  background-color: #EEE;
+  overflow: hidden;
+  position: relative;
+}
+
+.Tabs::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  height: 1px;
+  background-color: #CCC;
+}
+
+.Tabs-tab {
+  font-size: 12px;
+  padding: 0 12px;
+  color: #888;
+  position: relative;
+  list-style: none;
+  cursor: pointer;
+}
+
+.Tabs-tab.is-selected {
+  color: #222;
+}
+
+.Tabs-tab.is-selected:before {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  background: #888;
+  height: 2px;
+}

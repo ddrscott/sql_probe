@@ -4,4 +4,79 @@
 
 .EventTimeline-eventSet .vis-item-content {
   bottom: 0px;
+  border: 1px solid rgba(0, 0, 0, 0.075);
+}
+
+.EventTimeline-eventSet {
+  font-size: 12px;
+}
+
+.EventTimeline .vis-timeline {
+  border-style: none;
+}
+
+.EventTimeline .vis-foreground .vis-group {
+  border-bottom: 1px solid #EEE;
+}
+
+.EventTimeline-event::after {
+  content: '';
+  position: absolute;
+  top: -4px;
+  bottom: -4px;
+  left: -4px;
+  right: -4px;
+}
+
+.EventTimeline-event.vis-selected::after,
+.EventTimeline-event:hover::after {
+  background-color: black;
+  cursor: pointer;
+  opacity: 0.075;
+}
+
+.EventTimeline-event::after {
+  opacity: 0.1;
+}
+
+.EventTimeline .vis-panel.vis-left .vis-label:nth-child(2n),
+.EventTimeline .vis-foreground .vis-group:nth-child(2n) {
+  background-color: rgba(0,0,0, .03);
+}
+
+.EventTimeline .vis-panel.vis-center {
+  border-bottom-style: none;
+  border-left: 1px solid #CCC;
+  border-top-style: none;
+}
+
+.EventTimeline .vis-panel.vis-bottom {
+  font-size: 12px;
+}
+
+.EventTimeline .vis-panel.vis-left {
+  border-bottom-style: none;
+  border-top-style: none;
+  font-size: 12px;
+}
+
+.EventTimeline .vis-panel.vis-left .vis-label {
+  border-bottom: 1px solid #EEE;
+  display: flex;
+  flex-direction: row;
+}
+.EventTimeline .vis-panel.vis-left .vis-label .vis-inner {
+  align-self: center;
+}
+
+.EventTimeline .vis-panel.vis-left .vis-label:last-child {
+  border-bottom-style: none;
+}
+
+.EventTimeline .vis-panel .vis-background .vis-vertical.vis-grid.vis-minor {
+  display: none;
+}
+
+.EventTimeline .vis-panel .vis-background .vis-vertical.vis-grid.vis-major {
+  border-left: 1px solid #EEE;
 }

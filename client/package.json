@@ -4,6 +4,7 @@
   "private": true,
   "proxy": "http://localhost:3000/",
   "dependencies": {
+    "chart.js": "^2.5.0",
     "react": "^15.5.4",
     "react-codemirror": "^0.3.0",
     "react-dom": "^15.5.4",

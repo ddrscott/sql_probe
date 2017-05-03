@@ -6,10 +6,6 @@ import { DataSet, Timeline } from 'vis/dist/vis-timeline-graph2d.min.js';
 
 const flatten = arr => [].concat(...arr);
 
-// TODO: Replace new event id
-const eventId = e =>
-  `${e.time}:${e.transaction_id}:${e.duration}`
-
 export default class extends Component {
   constructor() {
     super();
@@ -22,7 +18,8 @@ export default class extends Component {
     };
     ProbeEvents.on(this.handleEventsUpdated);
     this.handleSelect = this.handleSelect.bind(this);
-    this.state = { eventSets: ProbeEvents.events };
+    this.handleVisibleEventsChanged = this.handleVisibleEventsChanged.bind(this);
+    this.state = { eventSets: ProbeEvents.events, visibleEventIds: [] };
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -34,6 +31,7 @@ export default class extends Component {
     this.timeline.setOptions({
       height: '100%',
       stack: false,
+      showMinorLabels: false,
       // sensible scrolling
       horizontalScroll: true,
       verticalScroll: true,
@@ -43,15 +41,52 @@ export default class extends Component {
       orientation: {
         axis: 'bottom',
         item: 'top'
+      },
+      showCurrentTime: false,
+      margin: {
+        axis: 10,
+        item: {
+          horizontal: 0,
+          vertical: 10
+        }
       }
     });
     this.timeline.on('select', this.handleSelect);
+    this.timeline.on('changed', this.handleVisibleEventsChanged)
     this.componentDidUpdate();
+  }
+
+  findEvent(id) {
+    return this.events.find(e => e.id === id);
+  }
+
+  findEventSet(id) {
+    return this.state.eventSets.find(e => e.id === id);
+  }
+
+  handleVisibleEventsChanged() {
+    const { onVisibleChange } = this.props;
+    if (onVisibleChange !== undefined) {
+      const events = this.timeline.getVisibleItems()
+                      .map(item => this.findEvent(item) || this.findEventSet(item))
+                      .filter(event => {
+                        return event !== undefined;
+                      });
+      const { visibleEventIds: prevVisibleEventIds } = this.state;
+      const visibleEventIds = events.map(e => e.id);
+
+      // Has the set of visible events changed?
+      const newEvents = new Set(visibleEventIds);
+      if (newEvents.size > 0 || visibleEventIds.length !== prevVisibleEventIds.length) {
+        this.setState({ visibleEventIds });
+        onVisibleChange(events);
+      }
+    }
   }
 
   handleSelect({ items }) {
     if (this.props.onSelect) {
-      const event = this.events.find(e => eventId(e) === items[0]);
+      const event = this.findEvent(items[0]);
       setTimeout(() => this.props.onSelect(event), 0);
     }
   }
@@ -60,23 +95,29 @@ export default class extends Component {
     const { eventSets } = this.state;
     return new DataSet(
       flatten(
-        eventSets.map(({ duration, start_time, params: { controller, action }, events }) => [
-          {
-            id: start_time,
-            start: (start_time*1000.0),
-            end: (start_time*1000.0 + duration),
-            content: `${controller}#${action}`,
-            type: 'background',
-            className: 'EventTimeline-eventSet',
-            align: 'center'
-          },
-          ...events.map(e => ({
-            id: eventId(e),
-            start: Date.parse(e.time),
-            end: Date.parse(e.end),
-            group: (e.sql || e.name)
-          }))
-        ])
+        eventSets.map(eventSet => {
+          const { color, end, events, name, time } = eventSet;
+          return [
+            {
+              id: eventSet.id,
+              start: time,
+              end: end,
+              content: name,
+              group: 'Rails Controller',
+              className: 'EventTimeline-eventSet',
+              align: 'center',
+              style: `border: none; background-color: ${color}`
+            },
+            ...events.map(e => ({
+              id: e.id,
+              start: e.time,
+              end: e.end,
+              group: e.name,
+              className: 'EventTimeline-event',
+              style: `border: none; background-color: ${e.color};`
+            }))
+          ]
+        })
       )
     );
   }
@@ -88,8 +129,13 @@ export default class extends Component {
   get timelineGroups() {
     const groupSet = new Set(this.events.map(e => e.sql || e.name));
     const groups = new DataSet();
+    groups.add({
+      id: 'Rails Controller',
+      content: 'Rails Controller Endpoint',
+      style: 'opacity: 0.5'
+    });
     for (let key of groupSet.keys()) {
-      groups.add({ id: key, content: key.slice(0, 30), style: 'font-size: 12px' });
+      groups.add({ id: key, content: key.slice(0, 30) });
     }
     return groups;
   }

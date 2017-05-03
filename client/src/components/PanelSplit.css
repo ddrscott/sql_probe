@@ -6,7 +6,7 @@
 }
 
 .PanelSplit-resizer {
-  height: 1px;
+  height: 2px;
   background: #AAA;
   cursor: ns-resize;
   position: relative;
@@ -25,7 +25,7 @@
 
 .PanelSplit-resizer--horizontal {
   height: 100%;
-  width: 1px;
+  width: 2px;
   position: relative;
   cursor: ew-resize;
 }
