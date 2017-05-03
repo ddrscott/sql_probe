@@ -6,6 +6,9 @@ import 'codemirror/lib/codemirror.css';
 import 'codemirror/mode/sql/sql';
 import PanelSplit from './PanelSplit';
 
+const KEY_J = 106;
+const KEY_K = 107;
+
 const SQL_CODE_MIRROR_OPTIONS = {
   lineNumbers: true,
   lineWrapping: true,
@@ -71,6 +74,7 @@ const EventDetails = ({ event: { caller, sql }, selectedCall, onSelectCall }) =>
 export default class extends Component {
   constructor() {
     super();
+    this.handleKeypress = this.handleKeypress.bind(this);
     this.state = { selectedCall: 0 };
   }
 
@@ -79,10 +83,22 @@ export default class extends Component {
       this.setState({ selectedCall: 0 });
   }
 
+
+  handleKeypress({ which }) {
+    const { props: { event }, state: { selectedCall } } = this;
+
+    switch(which) {
+    case KEY_J:
+      return this.setState({ selectedCall: Math.min(selectedCall + 1, event.caller.length - 1) });
+    case KEY_K:
+      return this.setState({ selectedCall: Math.max(selectedCall - 1, 0) });
+    }
+  }
+
   render() {
     const { props: { event }, state: { selectedCall } } = this;
     return (
-      <div className='EventDetails'>
+      <div className='EventDetails' onKeyPress={this.handleKeypress}>
         {event &&
           <EventDetails
             event={event}
