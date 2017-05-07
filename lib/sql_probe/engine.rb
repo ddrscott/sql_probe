@@ -1,5 +1,4 @@
 require 'tubesock'
-require 'react-rails'
 
 module SqlProbe
   class Engine < ::Rails::Engine
