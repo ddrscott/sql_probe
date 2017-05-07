@@ -19,7 +19,7 @@ Gem::Specification.new do |s|
 
   s.add_dependency 'rails', '>= 4.2'
   s.add_dependency 'tubesock'
-  s.add_dependency 'react-rails'
+  s.add_dependency 'puma'
 
   s.add_development_dependency 'rspec-rails'
 end
