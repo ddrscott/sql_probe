@@ -8,7 +8,7 @@ export const COLOR_SQL = '#36A2EB';
 export const COLOR_CONTROLLER = '#FF6384';
 export const COLOR_OTHER = '#DDD';
 
-let events = [];
+const events = [];
 let listeners = [];
 
 // TODO: Check w/@ddrscott that we can reasses the event set and event data
@@ -17,55 +17,44 @@ let listeners = [];
 //       - This might suggest that we don't care about EventSets... and
 //         everything is an Event...
 //    2. I suspect there alot of attributes we don't use...
-const mungeData = probeEvent => {
-  const { duration, events, start_time, params: { controller, action } } = probeEvent;
-  return {
-    ...probeEvent,
-    id: start_time,
-    name: `${controller}#${action}`,
-    type: TYPE_CONTROLLER,
-    time: Math.round(start_time*1000),
-    end: Math.round(start_time*1000 + duration),
-    color: COLOR_OTHER,
-    events: events.map((e, i) => {
-      const time = Date.parse(e.time);
-      return {
-        ...e,
-        id: `${start_time}-${i}`,
-        name: e.sql || e.name,
-        time,
-        end: (time + e.duration),
-        color: (
-            e.type === TYPE_ACTIVE_RECORD ? COLOR_ACTIVE_RECORD
-          : e.type === TYPE_SQL ? COLOR_SQL
-          : ''
-        )
-      };
-    })
-  };
-}
+const mungeEvent = ({ time, type, sql, name, duration }, id) => ({
+  id,
+  type,
+  name: sql || name,
+  time: Date.parse(time),
+  duration
+});
 
-const addEvent = event => {
-  events = events.concat(mungeData(event));
+const mungeEventSet = ({ duration, events, start_time, params: { controller, action } }) => ({
+  id: start_time,
+  type: TYPE_CONTROLLER,
+  name: `${controller}#${action}`,
+  time: (start_time * 1000),
+  duration,
+  events: events.map(mungeEvent)
+});
+
+const addEvent = eventSet => {
+  events.push(mungeEventSet(eventSet));
   listeners.forEach(l => l(events));
 }
 
-export default {
-  get events() { return events; },
+new WebSocket(`ws://${location.host}/sql_probe/live/feed`)
+  .onmessage = ({ data }) => {
+    if (data.charCodeAt(0) === 123 /* { */) {
+      addEvent(JSON.parse(data));
+    }
+  };
 
-  on(listener) {
-    if (listeners.indexOf(listener) === -1)
-      listeners.push(listener);
+export default {
+  events,
+
+  on(l) {
+    if (listeners.indexOf(l) === -1) {
+      listeners.push(l);
+    }
   },
 
-  off(listener) {
-    listeners = listeners.filter(l => l !== listener);
-  }
+  off(l) { listeners = listeners.filter(l => l !== l); }
 }
 
-const ws = new WebSocket(`ws://${location.host}/sql_probe/live/feed`);
-ws.onmessage = ({ data }) => {
-  if (data.charCodeAt(0) === 123 /* { */) {
-    addEvent(JSON.parse(data));
-  }
-};

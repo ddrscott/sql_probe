@@ -92,6 +92,7 @@ export default class extends Component {
       return this.setState({ selectedCall: Math.min(selectedCall + 1, event.caller.length - 1) });
     case KEY_K:
       return this.setState({ selectedCall: Math.max(selectedCall - 1, 0) });
+    default:
     }
   }
 

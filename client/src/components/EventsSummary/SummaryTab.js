@@ -6,13 +6,11 @@ import {
 import colorWheelHue from '../../utils/colorWheelHue';
 import Breakdown from './Breakdown';
 
-const round = num => ((num * 100) | 0) / 100;
+const round = num => ((num * 100.0) | 0) / 100.0;
 
 const sumTime = events =>
-  round(
-    events.reduce((total, { duration }) =>
-      total + duration, 0
-    )
+  events.reduce((total, { pct, event: { duration }}) =>
+    total + (duration * pct), 0.0
   );
 
 const compareValue = ({ value: a }, { value: b }) => b - a;
@@ -20,22 +18,22 @@ const compareValue = ({ value: a }, { value: b }) => b - a;
 const byType = (events=[]) => {
   if (events.length === 0) return [];
 
-  const ar = sumTime(events.filter(e => e.type === TYPE_ACTIVE_RECORD));
-  const sql = sumTime(events.filter(e => e.type === TYPE_SQL));
-  const other = sumTime(events.filter(e => e.type === TYPE_CONTROLLER)) - (ar + sql);
+  const ar = sumTime(events.filter(e => e.event.type === TYPE_ACTIVE_RECORD));
+  const sql = sumTime(events.filter(e => e.event.type === TYPE_SQL));
+  const other = Math.max(0.0, sumTime(events.filter(e => e.event.type === TYPE_CONTROLLER)) - (ar + sql));
 
   return [
-    { label: 'ActiveRecord', value: ar,    color: COLOR_ACTIVE_RECORD },
-    { label: 'SQL',          value: sql,   color: COLOR_SQL },
-    { label: 'Other',        value: other, color: COLOR_OTHER },
+    { label: 'ActiveRecord', value: round(ar),    color: COLOR_ACTIVE_RECORD },
+    { label: 'SQL',          value: round(sql),   color: COLOR_SQL },
+    { label: 'Other',        value: round(other), color: COLOR_OTHER },
   ].sort(compareValue);
 }
 
 const bySql = (events=[]) => {
   const sqlToEvent = new Map();
-  events.forEach(({ duration, name, type }) => {
+  events.forEach(({ pct, event: { duration, name, type }}) => {
     if (type === TYPE_SQL) {
-      sqlToEvent.set(name, duration + (sqlToEvent.get(name) || 0));
+      sqlToEvent.set(name, (duration * pct) + (sqlToEvent.get(name) || 0));
     }
   });
 

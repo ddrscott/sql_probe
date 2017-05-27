@@ -25,6 +25,7 @@ export default class extends Component {
     const { selectedEvent, visibleEvents } = this.state;
     return (
       <div className='App'>
+        <img src='http://localhost:3000/people?month=2017-06-01' width='1' height='1'/>
         <PanelSplit
           a={height =>
             <EventTimeline
