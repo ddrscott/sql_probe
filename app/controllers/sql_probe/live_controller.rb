@@ -1,7 +1,6 @@
 module SqlProbe
   class LiveController < SqlProbe::ApplicationController
     include Tubesock::Hijack
-    skip_before_action :verify_authenticity_token, only: [ :main ]
     layout false
 
     def index
