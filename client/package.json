@@ -8,12 +8,11 @@
     "react": "^15.5.4",
     "react-codemirror": "^0.3.0",
     "react-dom": "^15.5.4",
-    "react-draggable": "^2.2.3",
-    "unfetch": "^2.1.2",
-    "vis": "^4.19.1"
+    "react-draggable": "^2.2.6",
+    "unfetch": "^2.1.2"
   },
   "devDependencies": {
-    "react-scripts": "0.9.5"
+    "react-scripts": "1.0.7"
   },
   "scripts": {
     "start": "react-scripts start",
