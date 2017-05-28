@@ -10,8 +10,8 @@ export default class extends Component {
     this.state = { data: [] };
   }
 
-  updateData() {
-    const { chart, props: { items, reducer } } = this;
+  updateData({ items, reducer }) {
+    const { chart } = this;
     const data = reducer(items);
     this.setState({ data });
 
@@ -29,11 +29,13 @@ export default class extends Component {
     }
   }
 
-  componentWillReceiveProps({ items, reducer }) {
-    const { props } = this;
-    if(items && reducer
-        && (items !== props.items || reducer !== props.reducer)) {
-      this.updateData();
+  componentWillReceiveProps(props) {
+    const { items, reducer } = this.props;
+    if(
+      props.items && props.reducer
+        && (items !== props.items || reducer !== props.reducer)
+    ) {
+      this.updateData(props);
     }
   }
 
@@ -50,7 +52,7 @@ export default class extends Component {
           datasets: [ { data: [] } ]
         }
       });
-      this.updateData();
+      this.updateData(this.props);
     }
   }
 

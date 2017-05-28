@@ -157,11 +157,9 @@ class GridLines extends Component {
   }
 
   render() {
-    const { props: { min, max, unscaledViewBox, viewX, viewWidth } } = this;
+    const { props: { unscaledViewBox, viewX, viewWidth } } = this;
     const dividerWidth = this.dividerWidth(viewWidth);
     const gridLines = [];
-    const end = max - min;
-    const viewMax = viewX + viewWidth;
     const lastGridX = this.lastGridX(viewX, viewWidth);
     for (let x = this.firstGridX(viewX, viewWidth); x < lastGridX; x += dividerWidth) {
       gridLines.push(
@@ -213,7 +211,7 @@ export default class extends Component {
   }
 
   handleEventsUpdated = eventSets => {
-    this.setState(state(eventSets));
+    this.setState(state(eventSets), this.updateVisibleElements);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -336,6 +334,7 @@ export default class extends Component {
     return (
       <div className='EventTimeline'>
         <iframe
+          title='EventTimeline-resizeDetector'
           className='EventTimeline-resizeDetector'
           ref={this.onResizeDetectorMounted}
         />

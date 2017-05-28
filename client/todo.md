@@ -17,3 +17,8 @@
 - can't pan all the way to the right when zoomed in
 - "Sticky" event set (controller name)
   - currently the controller name scrolls out of view
+
+
+## Summary
+
+- Tooltip is cutoff

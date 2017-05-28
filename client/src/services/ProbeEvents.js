@@ -39,7 +39,9 @@ const addEvent = eventSet => {
   listeners.forEach(l => l(events));
 }
 
-new WebSocket(`ws://${location.host}/sql_probe/live/feed`)
+// TODO: not sure why this stopped working after rebasing the latest from master
+// new WebSocket(`ws://${window.location.host}/sql_probe/live/feed`)
+new WebSocket(`ws://localhost:3000/sql_probe/live/feed`)
   .onmessage = ({ data }) => {
     if (data.charCodeAt(0) === 123 /* { */) {
       addEvent(JSON.parse(data));
@@ -55,6 +57,6 @@ export default {
     }
   },
 
-  off(l) { listeners = listeners.filter(l => l !== l); }
+  off(l) { listeners = listeners.filter(lb => lb !== l); }
 }
 

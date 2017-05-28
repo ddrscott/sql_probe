@@ -8,16 +8,17 @@ import PanelSplit from './components/PanelSplit';
 export default class extends Component {
   constructor(){
     super();
-    this.handleSelect = this.handleSelect.bind(this);
-    this.handleVisibleEventsChange = this.handleVisibleEventsChange.bind(this);
     this.state = {
       selectedEvent: undefined,
       visibleEvents: []
     };
   }
 
-  handleSelect(selectedEvent) { this.setState({ selectedEvent }); }
-  handleVisibleEventsChange(visibleEvents) {
+  handleSelect = selectedEvent => {
+    this.setState({ selectedEvent });
+  }
+
+  handleVisibleEventsChange = visibleEvents => {
     this.setState({ visibleEvents });
   }
 
@@ -25,7 +26,13 @@ export default class extends Component {
     const { selectedEvent, visibleEvents } = this.state;
     return (
       <div className='App'>
+        {/* DEVELOPMENT ONLY: REMOVE ME */}
+        {/* DEVELOPMENT ONLY: REMOVE ME */}
+        {/* DEVELOPMENT ONLY: REMOVE ME */}
         <img src='http://localhost:3000/people?month=2017-06-01' width='1' height='1'/>
+        {/* DEVELOPMENT ONLY: REMOVE ME */}
+        {/* DEVELOPMENT ONLY: REMOVE ME */}
+        {/* DEVELOPMENT ONLY: REMOVE ME */}
         <PanelSplit
           a={height =>
             <EventTimeline
