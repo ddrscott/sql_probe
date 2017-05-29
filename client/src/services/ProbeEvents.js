@@ -27,7 +27,7 @@ const mungeEvent = ({ caller, duration, name, sql, time, type }, id) => ({
   type,
   sql,
   sqlHash: sql ? stringHash(sql) : 0,
-  name: sql || name,
+  name,
   isCached: name === 'CACHE',
   time: Date.parse(time),
   duration,

@@ -27,28 +27,28 @@ class Event extends Component {
   }
 
   render() {
-    const { event: { x, y, width, color, isCached, sqlHash }, isSelected} = this.props;
+    const { event: { model, x, y, width }, isSelected} = this.props;
     return (
       <rect
-        data-sqlhash={sqlHash}
+        data-sqlhash={model.sqlHash}
         x={x} y={y}
         width={width}
         className={
           `EventTimeline-item ${
             isSelected ? 'is-selected' : ''
           } ${
-            isCached ? 'is-cached' : ''
+            model.isCached ? 'is-cached' : ''
           }`
         }
-        style={{ color }}
-        fill={color}
+        style={{ color: model.color }}
+        fill={model.color}
         onClick={this.onClick}
       />
     );
   }
 }
 
-const Group = ({ group: { events, id, name, x, width }, onClick, selectedEvent, unscaledViewBox }) => (
+const Group = ({ group: { events, model, x, width }, onClick, selectedEvent, unscaledViewBox }) => (
   <g transform={`translate(${x})`}>
     <rect
       className='EventTimeline-item EventTimeline-item--group'
@@ -57,11 +57,11 @@ const Group = ({ group: { events, id, name, x, width }, onClick, selectedEvent, 
     />
     <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
       <text x='4' y={GROUP_MARGIN + 12 + 2} fontSize={12}>
-        {name}
+        {model.name}
       </text>
     </svg>
     {events.map(event =>
-      <Event event={event} isSelected={selectedEvent === event.model} key={event.id} onClick={onClick} />
+      <Event event={event} isSelected={selectedEvent === event.model} key={event.model.id} onClick={onClick} />
     )}
   </g>
 )
@@ -85,7 +85,7 @@ class Groups extends Component {
             group={group}
             onClick={onClick}
             selectedEvent={selectedEvent}
-            key={group.id}
+            key={group.model.id}
             unscaledViewBox={unscaledViewBox}
           />
         )}
@@ -167,30 +167,24 @@ const overlapPct = (x1, x2, y1, y2) =>
   );
 
 const eventState = (model, min, offsetIndexer) => {
-  const { type, id, isCached, name, time, duration, color, sqlHash } = model;
-  const y = (
+  const { type, name, sql, time, duration } = model;
+  const y = GROUP_MARGIN + ROW_HEIGHT_WITH_MARGIN + (
     type === TYPE_SQL
-      ? GROUP_MARGIN + (ROW_HEIGHT_WITH_MARGIN * (2 + offsetIndexer.getIndex(name) * 0.25))
-      : GROUP_MARGIN + ROW_HEIGHT_WITH_MARGIN
+      ? (ROW_HEIGHT_WITH_MARGIN * (1 + offsetIndexer.getIndex(sql || name) * 0.25))
+      : 0
   );
   return {
-    id,
-    sqlHash,
     model,
     width: Math.ceil(duration),
     x: time - min,
-    y,
-    color,
-    isCached
+    y
   };
 }
 
 const groupState = (model, min) => {
-  const { id, name, time, duration, events } = model;
+  const { time, duration, events } = model;
   const offsetIndexer = new KeyIndex();
   return {
-    name,
-    id,
     model,
     width: Math.ceil(duration),
     x: time - min,

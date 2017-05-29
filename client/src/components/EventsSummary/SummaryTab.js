@@ -42,7 +42,7 @@ const bySql = (events=[]) => {
     const event = events[i];
 
     if (event.event.type === TYPE_SQL) {
-      const { visibleDuration:value, event: { name:label, sqlHash } } = event;
+      const { visibleDuration:value, event: { sql:label, sqlHash } } = event;
 
       if (sqlToEvent.has(label)) {
         sqlToEvent.get(label).value += value;
