@@ -1,4 +1,5 @@
 import '../../css/flex.css';
+import './EventsSummary.css';
 import React, { Component } from 'react';
 import Tabs from '../Tabs';
 import SummaryTab from './SummaryTab';
@@ -27,9 +28,11 @@ export default class extends Component {
 
   render() {
     return (
-      <div className='flex'>
+      <div className='EventsSummary flex'>
         <Tabs tabs={TABS} currentTab={ this.state.currentTab } onSelect={this.handleTabSelect} />
-        {this.renderCurrentTab()}
+        <div className='EventsSummary-tabContents flex-grow'>
+          {this.renderCurrentTab()}
+        </div>
       </div>
     );
   }

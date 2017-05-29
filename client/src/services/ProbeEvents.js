@@ -1,13 +1,17 @@
+import KeyIndex from '../utils/KeyIndex';
+import colorWheelHue from '../utils/colorWheelHue';
+
 export const TYPE_ACTIVE_RECORD = 'instantiation.active_record';
 export const TYPE_SQL = 'sql.active_record';
 export const TYPE_CONTROLLER = 'rails.controller';
 export const TYPE_OTHER = 'other';
 
-export const COLOR_ACTIVE_RECORD = '#FFCE56';
+export const COLOR_ACTIVE_RECORD = '#E8E8E8';
 export const COLOR_SQL = '#36A2EB';
 export const COLOR_CONTROLLER = '#FF6384';
-export const COLOR_OTHER = '#DDD';
+export const COLOR_OTHER = '#E8E8E8';
 
+const colorIndexer = new KeyIndex();
 const events = [];
 let listeners = [];
 
@@ -17,12 +21,20 @@ let listeners = [];
 //       - This might suggest that we don't care about EventSets... and
 //         everything is an Event...
 //    2. I suspect there alot of attributes we don't use...
-const mungeEvent = ({ time, type, sql, name, duration }, id) => ({
+const mungeEvent = ({ caller, duration, name, sql, time, type }, id) => ({
   id,
   type,
+  sql,
   name: sql || name,
+  isCached: name === 'CACHE',
   time: Date.parse(time),
-  duration
+  duration,
+  caller,
+  color: (
+    type === TYPE_ACTIVE_RECORD
+      ? COLOR_ACTIVE_RECORD
+      : `hsl(${colorWheelHue(colorIndexer.getIndex(sql))}, 80%, 60%)`
+  )
 });
 
 const mungeEventSet = ({ duration, events, start_time, params: { controller, action } }) => ({

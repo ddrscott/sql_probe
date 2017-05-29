@@ -1,3 +1,7 @@
+.EventTimeline svg {
+  shape-rendering: optimizeSpeed;
+}
+
 .EventTimeline,
 .EventTimeline-svg,
 .EventTimeline-resizeDetector {
@@ -22,23 +26,37 @@
 }
 
 .EventTimeline-item {
-  height: 20px;
   cursor: pointer;
-  fill-opacity: 0.6;
+  height: 20px;
+  stroke: white;
+  stroke-width: 4;
+  stroke-opacity: 0;
+  vector-effect: non-scaling-stroke;
 }
 
 .EventTimeline-item:hover {
-  fill-opacity: 1.0;
+  stroke: #7ac1ff;
+  stroke-opacity: 1;
+}
+
+.EventTimeline-item.is-selected {
+  stroke: #0088ff;
+  stroke-opacity: 1;
+}
+
+.EventTimeline-item.is-cached {
+  fill-opacity: 0.2;
 }
 
 .EventTimeline-item--group {
-  fill: #DDD;
+  fill: #E8E8E8;
 }
 
 .EventTimeline-gridLine {
+  stroke-opacity: 0.2;
   stroke: #000;
-  stroke-width: 1;
-  opacity: 0.1;
+  stroke-width: 0.5px;
+  vector-effect: non-scaling-stroke;
 }
 
 .EventTimeline-gridLineLabel {

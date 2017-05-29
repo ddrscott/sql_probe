@@ -74,17 +74,23 @@ const EventDetails = ({ event: { caller, sql }, selectedCall, onSelectCall }) =>
 export default class extends Component {
   constructor() {
     super();
-    this.handleKeypress = this.handleKeypress.bind(this);
     this.state = { selectedCall: 0 };
   }
 
-  componentWillReceiveProps({ event }) {
-    if (event !== this.props.event)
-      this.setState({ selectedCall: 0 });
+  shouldComponentUpdate({ event }, { selectedCall }){
+    return (
+      event !== this.props.event
+      || selectedCall !== this.state.selectedCall
+    );
   }
 
+  componentWillReceiveProps({ event }) {
+    if (event !== this.props.event) {
+      this.setState({ selectedCall: 0 });
+    }
+  }
 
-  handleKeypress({ which }) {
+  handleKeypress = ({ which }) => {
     const { props: { event }, state: { selectedCall } } = this;
 
     switch(which) {

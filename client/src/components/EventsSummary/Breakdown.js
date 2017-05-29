@@ -3,6 +3,8 @@ import './Breakdown.css';
 import React, { Component } from 'react';
 import Chart from 'chart.js';
 
+const round = num => ((num * 100.0) | 0) / 100.0;
+
 export default class extends Component {
   constructor() {
     super();
@@ -57,35 +59,24 @@ export default class extends Component {
   }
 
   render() {
-    const {
-      state: { data },
-      props: { unit }
-    } = this;
+    const { state: { data }, props: { unit } } = this;
     return (
       <div className='Breakdown'>
-        <div className='flex flex--row'>
-          <div className='Breakdown-graphContainer'>
-            <canvas ref={this.mountCanvas}/>
-          </div>
-          <div className='flex-grow flex-self-center'>
-            <table>
-              <tbody>
-                {data.map(({ label, color, value }) =>
-                  <tr className='Breakdown-item' key={label}>
-                    <td className='Breakdown-value'>
-                      {`${value.toFixed(2)} ${unit}`}
-                    </td>
-                    <td>
-                      <div className='Breakdown-box' style={{color}} />
-                    </td>
-                    <td className='Breakdown-label'>
-                      {label}
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+        <div className='Breakdown-graphContainer'>
+          <canvas ref={this.mountCanvas}/>
+        </div>
+        <div className='Breakdown-table'>
+          {data.map(({ label, color, value }) =>
+            <div className='Breakdown-item' key={label}>
+              <div className='Breakdown-value'>
+                {round(value)} {unit}
+              </div>
+              <div className='Breakdown-box' style={{color}} />
+              <div className='Breakdown-label'>
+                {label}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     );

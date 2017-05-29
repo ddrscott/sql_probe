@@ -8,7 +8,7 @@ export default class KeyIndexer {
     let index = map.get(key);
     if (index !== undefined) return index;
 
-    index = map.size + 1;
+    index = map.size;
     map.set(key, index);
     return index;
   }
