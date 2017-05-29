@@ -1,5 +1,6 @@
 import KeyIndex from '../utils/KeyIndex';
 import colorWheelHue from '../utils/colorWheelHue';
+import stringHash from '../utils/stringHash';
 
 export const TYPE_ACTIVE_RECORD = 'instantiation.active_record';
 export const TYPE_SQL = 'sql.active_record';
@@ -25,6 +26,7 @@ const mungeEvent = ({ caller, duration, name, sql, time, type }, id) => ({
   id,
   type,
   sql,
+  sqlHash: sql ? stringHash(sql) : 0,
   name: sql || name,
   isCached: name === 'CACHE',
   time: Date.parse(time),

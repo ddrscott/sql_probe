@@ -76,8 +76,8 @@ export default class extends Component {
           <canvas ref={this.mountCanvas}/>
         </div>
         <div className='Breakdown-table'>
-          {data.map(({ label, color, value }) =>
-            <div className='Breakdown-item' key={label}>
+          {data.map(({ label, color, value }, i) =>
+            <div className='Breakdown-item' key={i}>
               <div className='Breakdown-value'>
                 {round(value)} {unit}
               </div>

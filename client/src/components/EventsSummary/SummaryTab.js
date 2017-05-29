@@ -42,13 +42,13 @@ const bySql = (events=[]) => {
     const event = events[i];
 
     if (event.event.type === TYPE_SQL) {
-      const { visibleDuration:value, event: { name:label } } = event;
+      const { visibleDuration:value, event: { name:label, sqlHash } } = event;
 
       if (sqlToEvent.has(label)) {
         sqlToEvent.get(label).value += value;
       }
       else {
-        const item = { label, value, color: event.event.color };
+        const item = { label, value, sqlHash, color: event.event.color };
         items.push(item);
         sqlToEvent.set(label, item);
       }
@@ -70,6 +70,11 @@ const bySql = (events=[]) => {
 export default ({ visibleEvents, onHoverSql }) => (
   <div className='SummaryTab flex flex--row'>
     <Breakdown items={visibleEvents} reducer={byType} unit='ms'/>
-    <Breakdown items={visibleEvents} reducer={bySql}  unit='ms' onHover={agg => onHoverSql(agg && agg.label)} />
+    <Breakdown
+      items={visibleEvents}
+      reducer={bySql}
+      unit='ms'
+      onHover={agg => onHoverSql(agg && agg.sqlHash)}
+    />
   </div>
 );

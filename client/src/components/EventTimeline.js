@@ -27,10 +27,10 @@ class Event extends Component {
   }
 
   render() {
-    const { event: { x, y, width, color, isCached, name }, isSelected} = this.props;
+    const { event: { x, y, width, color, isCached, sqlHash }, isSelected} = this.props;
     return (
       <rect
-        data-name={name}
+        data-sqlhash={sqlHash}
         x={x} y={y}
         width={width}
         className={
@@ -167,16 +167,15 @@ const overlapPct = (x1, x2, y1, y2) =>
   );
 
 const eventState = (model, min, offsetIndexer) => {
-  const { type, id, isCached, name, time, duration, color } = model;
+  const { type, id, isCached, name, time, duration, color, sqlHash } = model;
   const y = (
     type === TYPE_SQL
-      // ? GROUP_MARGIN + (ROW_HEIGHT_WITH_MARGIN * (2 + offsetIndexer.getIndex(name) * 0.25))
       ? GROUP_MARGIN + (ROW_HEIGHT_WITH_MARGIN * (2 + offsetIndexer.getIndex(name) * 0.25))
       : GROUP_MARGIN + ROW_HEIGHT_WITH_MARGIN
   );
   return {
-    name,
     id,
+    sqlHash,
     model,
     width: Math.ceil(duration),
     x: time - min,
@@ -392,7 +391,7 @@ export default class EventTimeline extends Component {
             .EventTimeline-item {
               opacity: 0.25;
             }
-            .EventTimeline-item[data-name='${hoveredSql}'] {
+            .EventTimeline-item[data-sqlhash='${hoveredSql}'] {
               opacity: 1;
               fill-opacity: 1;
               stroke: currentColor;
