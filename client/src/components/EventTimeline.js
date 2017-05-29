@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
 import './EventTimeline.css';
 import ProbeEvents, { TYPE_SQL } from '../services/ProbeEvents';
-import colorWheelHue from '../utils/colorWheelHue';
 import KeyIndex from '../utils/KeyIndex';
 
 const MARGIN = 4;
@@ -22,16 +21,16 @@ class Event extends Component {
   onClick = e => {
     const { onClick, event } = this.props;
     if (onClick) {
-      const { nativeEvent } = e;
       e.stopPropagation();
       onClick(event.model);
     }
   }
 
   render() {
-    const { event: { x, y, width, color, isCached }, isSelected} = this.props;
+    const { event: { x, y, width, color, isCached, name }, isSelected} = this.props;
     return (
       <rect
+        data-name={name}
         x={x} y={y}
         width={width}
         className={
@@ -41,6 +40,7 @@ class Event extends Component {
             isCached ? 'is-cached' : ''
           }`
         }
+        style={{ color }}
         fill={color}
         onClick={this.onClick}
       />
@@ -254,6 +254,7 @@ export default class EventTimeline extends Component {
     || viewWidth !== nextState.viewWidth
     || unscaledViewBox !== nextState.unscaledViewBox
     || selectedEvent !== nextState.selectedEvent
+    || this.props.hoveredSql !== nextProps.hoveredSql
     );
   }
 
@@ -374,6 +375,7 @@ export default class EventTimeline extends Component {
   onClearSelectedEvent = () => this.onEventSelected(null)
 
   render() {
+    const { hoveredSql } = this.props;
     const {
       groups, max, min, selectedEvent, unscaledViewBox, viewX, viewWidth,
       size: [ width, height ]
@@ -385,6 +387,19 @@ export default class EventTimeline extends Component {
           className='EventTimeline-resizeDetector'
           ref={this.onResizeDetectorMounted}
         />
+        { hoveredSql &&
+          <style>{`
+            .EventTimeline-item {
+              opacity: 0.25;
+            }
+            .EventTimeline-item[data-name='${hoveredSql}'] {
+              opacity: 1;
+              fill-opacity: 1;
+              stroke: currentColor;
+              stroke-opacity: 1;
+            }
+          `}</style>
+        }
         <svg
           className='EventTimeline-svg'
           onWheel={this.onWheelEvent}

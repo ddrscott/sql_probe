@@ -4,6 +4,7 @@
 
 ## Timeline
 
+- On hover, event tooltip
 - zoom centered at mouse
 - Initial zoom level seems doesn't seem to zoom in on the data set
 - can't pan all the way to the right when zoomed in
@@ -13,4 +14,10 @@
 
 ## Summary
 
+- Breakdown of tables
 - Tooltip is cutoff
+
+
+## Details
+
+- When activeRecord.instantation is selected don't show sql panel

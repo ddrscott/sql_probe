@@ -12,6 +12,10 @@ export default class extends Component {
     this.state = { data: [] };
   }
 
+  onHover = (e, [target]) => {
+    this.props.onHover(target && this.state.data[target._index])
+  }
+
   updateData({ items, reducer }) {
     const { chart } = this;
     const data = reducer(items);
@@ -47,7 +51,13 @@ export default class extends Component {
       this.chart = new Chart(canvas, {
         type: 'pie',
         options: {
-          legend: { display: false }
+          ...(this.props.onHover && {
+            hover: {
+              onHover: this.onHover,
+              mode: 'index'
+            }
+          }),
+          legend: { display: false },
         },
         data: {
           labels: [],

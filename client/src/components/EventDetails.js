@@ -93,12 +93,11 @@ export default class extends Component {
   handleKeypress = ({ which }) => {
     const { props: { event }, state: { selectedCall } } = this;
 
-    switch(which) {
-    case KEY_J:
-      return this.setState({ selectedCall: Math.min(selectedCall + 1, event.caller.length - 1) });
-    case KEY_K:
-      return this.setState({ selectedCall: Math.max(selectedCall - 1, 0) });
-    default:
+    if (which === KEY_J) {
+      this.setState({ selectedCall: Math.min(selectedCall + 1, event.caller.length - 1) });
+    }
+    else if (which === KEY_K) {
+      this.setState({ selectedCall: Math.max(selectedCall - 1, 0) });
     }
   }
 

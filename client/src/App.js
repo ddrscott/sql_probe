@@ -9,8 +9,9 @@ export default class extends Component {
   constructor(){
     super();
     this.state = {
-      selectedEvent: undefined,
-      visibleEvents: []
+      hoveredSql: null,
+      selectedEvent: null,
+      visibleEvents: [],
     };
   }
 
@@ -22,14 +23,19 @@ export default class extends Component {
     this.setState({ visibleEvents });
   }
 
+  onHoverSql = hoveredSql => {
+    this.setState({ hoveredSql });
+  }
+
   render() {
-    const { selectedEvent, visibleEvents } = this.state;
+    const { selectedEvent, visibleEvents, hoveredSql } = this.state;
     return (
       <div className='App'>
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
-        <img src='http://localhost:3000/people?month=2017-06-01' width='1' height='1'/>
+        <img src='http://localhost:3000/people' width='1' height='1'/>
+        {/*<img src='http://localhost:3000/naughty/unbound_sql' width='1' height='1'/>*/}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
@@ -38,12 +44,13 @@ export default class extends Component {
             <EventTimeline
               onSelect={this.handleSelect}
               onVisibleChange={this.handleVisibleEventsChange}
+              hoveredSql={hoveredSql}
             />
           }
           b={
             selectedEvent
               ? <EventDetails event={selectedEvent} />
-              : <EventsSummary visibleEvents={visibleEvents} />
+              : <EventsSummary visibleEvents={visibleEvents} onHoverSql={this.onHoverSql} />
           }
         />
       </div>

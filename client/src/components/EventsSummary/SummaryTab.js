@@ -67,9 +67,9 @@ const bySql = (events=[]) => {
   );
 }
 
-export default ({ visibleEvents }) => (
+export default ({ visibleEvents, onHoverSql }) => (
   <div className='SummaryTab flex flex--row'>
-    <Breakdown items={visibleEvents} reducer={byType} unit='ms' />
-    <Breakdown items={visibleEvents} reducer={bySql}  unit='ms' />
+    <Breakdown items={visibleEvents} reducer={byType} unit='ms'/>
+    <Breakdown items={visibleEvents} reducer={bySql}  unit='ms' onHover={agg => onHoverSql(agg && agg.label)} />
   </div>
 );
