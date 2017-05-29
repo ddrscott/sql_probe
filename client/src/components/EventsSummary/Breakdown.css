@@ -15,7 +15,7 @@
 .Breakdown-table {
   display: inline-block;
   position: absolute;
-  max-height: 100%;
+  max-height: calc(100% - 40px);
   overflow-y: auto;
   padding: 20px 0px;
   box-shadow: inset 0 0px 30px 5px white;
