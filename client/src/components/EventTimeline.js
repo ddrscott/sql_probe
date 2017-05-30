@@ -97,11 +97,12 @@ class Groups extends Component {
 class GridLines extends Component {
   shouldComponentUpdate({ viewWidth, viewX, unscaledViewBox }) {
     const { props } = this;
+    let dividerWidth, prevDividerWidth;
     return (
        unscaledViewBox !== props.unscaledViewBox
-    || this.dividerWidth(viewWidth) !== this.dividerWidth(props.viewWidth)
-    || this.firstGridX(viewX, viewWidth) !== this.firstGridX(props.viewX, props.viewWidth)
-    || this.lastGridX(viewX, viewWidth) !== this.lastGridX(props.viewX, props.viewWidth)
+    || (dividerWidth = this.dividerWidth(viewWidth)) !== (prevDividerWidth = this.dividerWidth(props.viewWidth))
+    || this.firstGridX(viewX, dividerWidth) !== this.firstGridX(props.viewX, prevDividerWidth)
+    || this.lastGridX(viewX, viewWidth, dividerWidth) !== this.lastGridX(props.viewX, props.viewWidth, prevDividerWidth)
     );
   }
 
@@ -113,13 +114,11 @@ class GridLines extends Component {
     return Math.max(5.0, result);
   }
 
-  firstGridX(viewX, viewWidth) {
-    const dividerWidth = this.dividerWidth(viewWidth);
+  firstGridX(viewX, dividerWidth) {
     return Math.ceil(viewX / dividerWidth) * dividerWidth;
   }
 
-  lastGridX(viewX, viewWidth) {
-    const dividerWidth = this.dividerWidth(viewWidth);
+  lastGridX(viewX, viewWidth, dividerWidth) {
     return Math.ceil((viewX + viewWidth) / dividerWidth) * dividerWidth;
   }
 
@@ -127,8 +126,8 @@ class GridLines extends Component {
     const { props: { unscaledViewBox, viewX, viewWidth } } = this;
     const dividerWidth = this.dividerWidth(viewWidth);
     const gridLines = [];
-    const lastGridX = this.lastGridX(viewX, viewWidth);
-    for (let x = this.firstGridX(viewX, viewWidth); x < lastGridX; x += dividerWidth) {
+    const lastGridX = this.lastGridX(viewX, viewWidth, dividerWidth);
+    for (let x = this.firstGridX(viewX, dividerWidth); x < lastGridX; x += dividerWidth) {
       gridLines.push(
         <g key={x} transform={`translate(${x})`}>
           <line
