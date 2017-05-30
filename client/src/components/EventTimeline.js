@@ -127,9 +127,10 @@ class GridLines extends Component {
     const dividerWidth = this.dividerWidth(viewWidth);
     const gridLines = [];
     const lastGridX = this.lastGridX(viewX, viewWidth, dividerWidth);
+    let i=0;
     for (let x = this.firstGridX(viewX, dividerWidth); x < lastGridX; x += dividerWidth) {
       gridLines.push(
-        <g key={x} transform={`translate(${x})`}>
+        <g key={i++} transform={`translate(${x})`}>
           <line
             className='EventTimeline-gridLine'
             x1='0' y1='0'
