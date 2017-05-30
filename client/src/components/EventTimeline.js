@@ -7,7 +7,7 @@ const MARGIN = 4;
 const GROUP_MARGIN = MARGIN * 2;
 const ROW_HEIGHT = 20;
 const ROW_HEIGHT_WITH_MARGIN = ROW_HEIGHT + MARGIN * 2;
-const VIEW_MARGIN = 10;
+const VIEW_MARGIN_MS = 10;
 
 class Event extends Component {
   shouldComponentUpdate({ event, isSelected }){
@@ -95,12 +95,10 @@ class Groups extends Component {
 }
 
 class GridLines extends Component {
-  shouldComponentUpdate({ max, min, viewWidth, viewX, unscaledViewBox }) {
+  shouldComponentUpdate({ viewWidth, viewX, unscaledViewBox }) {
     const { props } = this;
     return (
-       max !== props.max
-    || min !== props.min
-    || unscaledViewBox !== props.unscaledViewBox
+       unscaledViewBox !== props.unscaledViewBox
     || this.dividerWidth(viewWidth) !== this.dividerWidth(props.viewWidth)
     || this.firstGridX(viewX, viewWidth) !== this.firstGridX(props.viewX, props.viewWidth)
     || this.lastGridX(viewX, viewWidth) !== this.lastGridX(props.viewX, props.viewWidth)
@@ -108,13 +106,11 @@ class GridLines extends Component {
   }
 
   dividerWidth(viewWidth) {
-    return (
-      viewWidth / 1000 >= 3.0 ? 1000
-    : viewWidth /  500 >= 3.0 ?  500
-    : viewWidth /  100 >= 3.0 ?  100
-    : viewWidth /   50 >= 3.0 ?   50
-    : 10
-    )
+    const order = Math.log10(viewWidth / 3.0);
+    const lowerOrder = Math.floor(order);
+    // Determine whether divder width should be half step (ex. 5, 50, 500, ...)
+    const result = Math.pow(10.0, lowerOrder) * (0.69897 < order - lowerOrder  ? 5.0 : 1.0);
+    return Math.max(5.0, result);
   }
 
   firstGridX(viewX, viewWidth) {
@@ -193,23 +189,13 @@ const groupState = (model, min) => {
 }
 
 const state = eventSets => {
-  let min = Number.MAX_SAFE_INTEGER;
-  let max = 0;
-
-  for (let i = 0; i < eventSets.length; ++i) {
-    const { time, duration } = eventSets[i];
-    min = Math.min(time, min);
-    max = Math.min(time + duration, max);
-  }
-
-  min -= VIEW_MARGIN;
-  max += VIEW_MARGIN;
+  const min = Math.min(...eventSets.map(es => es.time)) - VIEW_MARGIN_MS;
+  const max = Math.min(...eventSets.map(es => es.time + es.duration)) + VIEW_MARGIN_MS;
 
   return {
     eventSets,
     groups: eventSets.map(es => groupState(es, min)),
-    min,
-    max
+    maxViewWidth: max - min
   };
 }
 
@@ -309,11 +295,11 @@ export default class EventTimeline extends Component {
 
 
   scrollHoriz(amt) {
-    const { min, max, size: [ width ], viewX } = this.state;
+    const { maxViewWidth, size: [ width ], viewX, viewWidth } = this.state;
     this.setState({
       viewX: (
         Math.min(
-          Math.max(width, max - min - width),
+          (maxViewWidth - viewWidth),
           Math.max(0,
             viewX + (amt * this.viewToPixel)
           )
@@ -322,26 +308,42 @@ export default class EventTimeline extends Component {
     }, this.updateVisibleElements);
   }
 
-  scrollVert(amt) {
-    this.setState({
-      viewWidth: (
-        Math.min(4000,  // Max Zoom Out (4 seconds)
-          Math.max(100, // Max Zoom In (100 ms)
-            this.state.viewWidth + amt * this.viewToPixel
-          )
+  scrollVert(amt, clientX) {
+    const { viewToPixel, state: {maxViewWidth, viewX, viewWidth} } = this;
+
+    // Scale zoom amount to the view
+    const changeAmt = amt * viewToPixel;
+    const viewClientX = clientX * viewToPixel;
+    // Target ratio to maintain
+    const ratio = viewClientX / viewWidth;
+
+    const newViewWidth = (
+      Math.max(
+        20, // Prevent zooming in further than 20 ms
+        Math.min(
+          maxViewWidth, // Prevent zooming out further than all the data (max/min)
+          changeAmt + viewWidth
         )
       )
+    );
+    let newViewX = viewX + (viewClientX - (ratio * newViewWidth));
+    // If the right edge will go beyond the max, move the view left
+    newViewX -= Math.max(0, newViewX + newViewWidth - maxViewWidth);
+
+    this.setState({
+      viewWidth: newViewWidth,
+      viewX: Math.max(0, newViewX) // Prevent the left edge going past the min
     }, this.updateVisibleElements);
   }
 
   onWheelEvent = ({ nativeEvent }) => {
-    const { deltaY, deltaX } = nativeEvent;
+    const { deltaY, deltaX, clientX } = nativeEvent;
     nativeEvent.preventDefault();
 
     // Prevent scrolling and zooming at the same time.
     // Favor the operation that has most motion towards.
     if (deltaX !== 0 && Math.abs(deltaX / deltaY) > 2.0) this.scrollHoriz(deltaX);
-    else this.scrollVert(deltaY);
+    else this.scrollVert(deltaY, clientX);
   }
 
   onResizeDetectorMounted = (resizeDetector) => {
