@@ -45,7 +45,7 @@
 }
 
 .EventTimeline-item.is-cached {
-  fill-opacity: 0.2;
+  fill-opacity: 0.5;
 }
 
 .EventTimeline-item--group {

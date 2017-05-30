@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import './EventTimeline.css';
 import ProbeEvents, { TYPE_SQL } from '../services/ProbeEvents';
-import KeyIndex from '../utils/KeyIndex';
 
 const MARGIN = 4;
 const GROUP_MARGIN = MARGIN * 2;
 const ROW_HEIGHT = 20;
+const COUNT_HEIGHT_INCREMENT = ROW_HEIGHT / 4;
 const ROW_HEIGHT_WITH_MARGIN = ROW_HEIGHT + MARGIN * 2;
 const VIEW_MARGIN_MS = 10;
 
@@ -27,7 +27,7 @@ class Event extends Component {
   }
 
   render() {
-    const { event: { model, x, y, width }, isSelected} = this.props;
+    const { event: { model, x, y, width, height }, isSelected} = this.props;
     return (
       <rect
         data-sqlhash={model.sqlHash}
@@ -40,7 +40,7 @@ class Event extends Component {
             model.isCached ? 'is-cached' : ''
           }`
         }
-        style={{ color: model.color }}
+        style={{ color: model.color, height: `${height}px` }}
         fill={model.color}
         onClick={this.onClick}
       />
@@ -162,16 +162,22 @@ const overlapPct = (x1, x2, y1, y2) =>
     ) / (x2 - x1)
   );
 
-const eventState = (model, min, offsetIndexer) => {
-  const { type, name, sql, time, duration } = model;
+const eventState = (model, min, sqlToCount) => {
+  const { type, sql, time, duration } = model;
   const y = GROUP_MARGIN + ROW_HEIGHT_WITH_MARGIN + (
     type === TYPE_SQL
-      ? (ROW_HEIGHT_WITH_MARGIN * (1 + offsetIndexer.getIndex(sql || name) * 0.25))
+      ? ROW_HEIGHT_WITH_MARGIN
       : 0
   );
+  const sqlCount = (
+    type === TYPE_SQL
+      ? sqlToCount.get(sql)
+      : 0
+  )
   return {
     model,
     width: Math.ceil(duration),
+    height: ROW_HEIGHT + COUNT_HEIGHT_INCREMENT * sqlCount,
     x: time - min,
     y
   };
@@ -179,19 +185,24 @@ const eventState = (model, min, offsetIndexer) => {
 
 const groupState = (model, min) => {
   const { time, duration, events } = model;
-  const offsetIndexer = new KeyIndex();
+  const sqlToCount = new Map();
+  events
+    .filter(e => e.type === TYPE_SQL)
+    .forEach(({ sql }) => {
+      sqlToCount.set(sql, (sqlToCount.get(sql) || 0) + 1)
+    });
+
   return {
     model,
     width: Math.ceil(duration),
     x: time - min,
-    events: events.map(e => eventState(e, time, offsetIndexer))
+    events: events.map(e => eventState(e, time, sqlToCount))
   };
 }
 
 const state = eventSets => {
   const min = Math.min(...eventSets.map(es => es.time)) - VIEW_MARGIN_MS;
-  const max = Math.min(...eventSets.map(es => es.time + es.duration)) + VIEW_MARGIN_MS;
-
+  const max = Math.max(...eventSets.map(es => es.time + es.duration)) + VIEW_MARGIN_MS;
   return {
     eventSets,
     groups: eventSets.map(es => groupState(es, min)),
@@ -215,7 +226,8 @@ export default class EventTimeline extends Component {
       viewWidth: 0,
       size: [ 0, 0 ],
       unscaledViewBox: '0 0 0 0',
-      selectedEvent: null
+      selectedEvent: null,
+      hoveredSql: null
     };
 
     ProbeEvents.on(this.handleEventsUpdated);
@@ -226,13 +238,14 @@ export default class EventTimeline extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { eventSets, selectedEvent, viewX, viewWidth, unscaledViewBox } = this.state;
+    const { eventSets, hoveredSql, selectedEvent, viewX, viewWidth, unscaledViewBox } = this.state;
     return (
        eventSets !== nextState.eventSets
     || viewX !== nextState.viewX
     || viewWidth !== nextState.viewWidth
     || unscaledViewBox !== nextState.unscaledViewBox
     || selectedEvent !== nextState.selectedEvent
+    || hoveredSql !== nextState.hoveredSql
     || this.props.hoveredSql !== nextProps.hoveredSql
     );
   }
@@ -295,7 +308,7 @@ export default class EventTimeline extends Component {
 
 
   scrollHoriz(amt) {
-    const { maxViewWidth, size: [ width ], viewX, viewWidth } = this.state;
+    const { maxViewWidth, viewX, viewWidth } = this.state;
     this.setState({
       viewX: (
         Math.min(
@@ -368,13 +381,17 @@ export default class EventTimeline extends Component {
   }
 
   onClearSelectedEvent = () => this.onEventSelected(null)
+  onMouseOver = ({ target }) => this.setState({ hoveredSql: target.dataset.sqlhash })
+  onMouseOut = e => this.setState({ hoveredSql: null })
 
   render() {
     const { hoveredSql } = this.props;
     const {
-      groups, max, min, selectedEvent, unscaledViewBox, viewX, viewWidth,
-      size: [ width, height ]
+      groups, hoveredSql: stateHoveredSql, max, min, selectedEvent,
+      unscaledViewBox, viewX, viewWidth, size: [ width, height ]
     } = this.state;
+    const finalHoveredSql = stateHoveredSql || hoveredSql;
+
     return (
       <div className='EventTimeline'>
         <iframe
@@ -382,16 +399,14 @@ export default class EventTimeline extends Component {
           className='EventTimeline-resizeDetector'
           ref={this.onResizeDetectorMounted}
         />
-        { hoveredSql &&
+        { finalHoveredSql &&
           <style>{`
-            .EventTimeline-item {
-              opacity: 0.25;
-            }
-            .EventTimeline-item[data-sqlhash='${hoveredSql}'] {
-              opacity: 1;
-              fill-opacity: 1;
+            .EventTimeline-item[data-sqlhash='${finalHoveredSql}'] {
               stroke: currentColor;
               stroke-opacity: 1;
+            }
+            .EventTimeline-item[data-sqlhash='${finalHoveredSql}'].is-cached {
+              stroke-opacity: 0.5;
             }
           `}</style>
         }
@@ -403,6 +418,8 @@ export default class EventTimeline extends Component {
           width={width}
           height={height}
           onClick={this.onClearSelectedEvent}
+          onMouseOver={this.onMouseOver}
+          onMouseOut={this.onMouseOut}
         >
           <g transform='translate(0, 20)'>
             <Groups
