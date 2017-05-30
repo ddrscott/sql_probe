@@ -24,7 +24,7 @@ export default class extends Component {
     if (chart) {
       const colors = data.map(d => d.color);
       chart.data.labels = data.map(d => d.label);
-      chart.data.datasets[0].data = data.map(d => d.value);
+      chart.data.datasets[0].data = data.map(d => round(d.value));
 
       Object.assign(chart.data.datasets[0], {
         data: data.map(d => d.value),
