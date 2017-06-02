@@ -1,7 +1,7 @@
 import './Tabs.css';
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 
-export default class extends Component {
+export default class Tabs extends PureComponent {
   render() {
     const { props: { tabs, currentTab, onSelect } } = this;
     return (

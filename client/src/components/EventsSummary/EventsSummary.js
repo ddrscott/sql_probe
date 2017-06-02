@@ -7,16 +7,13 @@ import PivotTab from './PivotTab';
 
 const TABS = [ 'Summary', 'Pivot' ];
 
-export default class extends Component {
+export default class EventsSummary extends Component {
   constructor() {
     super();
-    this.handleTabSelect = this.handleTabSelect.bind(this);
     this.state = { currentTab: TABS[0] };
   }
 
-  handleTabSelect(currentTab) {
-    this.setState({ currentTab });
-  }
+  onTabSelect = currentTab => this.setState({ currentTab })
 
   renderCurrentTab() {
     switch(this.state.currentTab) {
@@ -29,7 +26,11 @@ export default class extends Component {
   render() {
     return (
       <div className='EventsSummary flex'>
-        <Tabs tabs={TABS} currentTab={ this.state.currentTab } onSelect={this.handleTabSelect} />
+        <Tabs
+          tabs={TABS}
+          currentTab={this.state.currentTab}
+          onSelect={this.onTabSelect}
+        />
         <div className='EventsSummary-tabContents flex-grow'>
           {this.renderCurrentTab()}
         </div>

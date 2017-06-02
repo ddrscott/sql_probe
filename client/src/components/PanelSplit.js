@@ -5,7 +5,7 @@ import { DraggableCore } from 'react-draggable';
 const renderPanel = (p, size) =>
   typeof p === 'function' ? p(size) : p;
 
-export default class extends Component {
+export default class PanelSplit extends Component {
   constructor({ initialSize = 300 }){
     super();
     this.state = {

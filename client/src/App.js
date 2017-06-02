@@ -5,7 +5,7 @@ import EventsSummary from './components/EventsSummary/EventsSummary';
 import EventTimeline from './components/EventTimeline';
 import PanelSplit from './components/PanelSplit';
 
-export default class extends Component {
+export default class App extends Component {
   constructor(){
     super();
     this.state = {
@@ -34,7 +34,7 @@ export default class extends Component {
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
-        <img src='http://localhost:3000/people' width='1' height='1'/>
+        {/*<img src='http://localhost:3000/people' width='1' height='1'/>*/}
         {/*<img src='http://localhost:3000/naughty/unbound_sql' width='1' height='1'/>*/}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}

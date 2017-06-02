@@ -1,5 +1,7 @@
 .EventTimeline svg {
   shape-rendering: optimizeSpeed;
+  overflow: hidden;
+  transform: translateZ(0);
 }
 
 .EventTimeline,

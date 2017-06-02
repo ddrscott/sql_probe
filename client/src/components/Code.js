@@ -12,7 +12,7 @@ const getMode = call => {
   return ext === 'erb' ? 'application/x-erb' : 'ruby';
 };
 
-export default class extends Component {
+export default class Code extends Component {
   constructor({ path }) {
     super();
     this.fetchCode(path);

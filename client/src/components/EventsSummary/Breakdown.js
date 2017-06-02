@@ -5,7 +5,7 @@ import Chart from 'chart.js';
 
 const round = num => ((num * 100.0) | 0) / 100.0;
 
-export default class extends Component {
+export default class Breakdown extends Component {
   constructor() {
     super();
     this.mountCanvas = this.mountCanvas.bind(this);

@@ -40,38 +40,7 @@ const StackTrace = ({ callStack, selected, onSelect }) => (
 
 const getFilename = locator => locator.split(/:\d+:in /)[0];
 
-const EventDetails = ({ event: { caller, sql }, selectedCall, onSelectCall }) => {
-  const locator = caller[selectedCall];
-  return (
-    <PanelSplit
-      initialSize={40}
-      a={<CodeMirror className='EventDetails-sql' value={sql} options={SQL_CODE_MIRROR_OPTIONS} />}
-      b={
-        <PanelSplit
-          orientation='horizontal'
-          a={
-            <div className='EventDetails-stack'>
-              <div className='EventDetails-panelHeader'>Stack</div>
-              <StackTrace
-                callStack={caller}
-                selected={selectedCall}
-                onSelect={onSelectCall}
-              />
-            </div>
-          }
-          b={
-            <div className='EventDetails-code'>
-              <div className='EventDetails-panelHeader'>{getFilename(locator)}</div>
-              <Code className='EventDetails-ruby' path={locator}/>
-            </div>
-          }
-        />
-      }
-    />
-  );
-};
-
-export default class extends Component {
+export default class EventDetails extends Component {
   constructor() {
     super();
     this.state = { selectedCall: 0 };
@@ -90,7 +59,7 @@ export default class extends Component {
     }
   }
 
-  handleKeypress = ({ which }) => {
+  onKeypress = ({ which }) => {
     const { props: { event }, state: { selectedCall } } = this;
 
     if (which === KEY_J) {
@@ -101,18 +70,43 @@ export default class extends Component {
     }
   }
 
+  onSelectCall = selectedCall => this.setState({ selectedCall })
+
   render() {
-    const { props: { event }, state: { selectedCall } } = this;
-    return (
-      <div className='EventDetails' onKeyPress={this.handleKeypress}>
-        {event &&
-          <EventDetails
-            event={event}
-            selectedCall={selectedCall}
-            onSelectCall={selectedCall => this.setState({ selectedCall })}
-          />
-        }
-      </div>
-    );
+    const { props: { event }, state: { selectedCall }, onKeypress, onSelectCall } = this;
+    let panel = null;
+    if (event) {
+      const { caller, sql } = event;
+      const locator = caller[selectedCall];
+      panel = (
+        <PanelSplit
+          initialSize={40}
+          a={<CodeMirror className='EventDetails-sql' value={sql} options={SQL_CODE_MIRROR_OPTIONS} />}
+          b={
+            <PanelSplit
+              orientation='horizontal'
+              a={
+                <div className='EventDetails-stack'>
+                  <div className='EventDetails-panelHeader'>Stack</div>
+                  <StackTrace
+                    callStack={caller}
+                    selected={selectedCall}
+                    onSelect={onSelectCall}
+                  />
+                </div>
+              }
+              b={
+                <div className='EventDetails-code'>
+                  <div className='EventDetails-panelHeader'>{getFilename(locator)}</div>
+                  <Code className='EventDetails-ruby' path={locator}/>
+                </div>
+              }
+            />
+          }
+        />
+      )
+    }
+
+    return <div className='EventDetails' onKeyPress={onKeypress}>{panel}</div>;
   }
 }
