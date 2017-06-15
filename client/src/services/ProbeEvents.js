@@ -1,5 +1,7 @@
+import MOCK_EVENTS from './MOCK_ProbeEvents';
+
 import KeyIndex from '../utils/KeyIndex';
-import colorWheelHue from '../utils/colorWheelHue';
+import color from '../utils/colorWheelHue';
 import stringHash from '../utils/stringHash';
 
 export const TYPE_ACTIVE_RECORD = 'instantiation.active_record';
@@ -12,8 +14,8 @@ export const COLOR_SQL = '#36A2EB';
 export const COLOR_CONTROLLER = '#FF6384';
 export const COLOR_OTHER = '#E8E8E8';
 
-const colorIndexer = new KeyIndex();
-const events = [];
+// const colorIndexer = new KeyIndex();
+const events = window.EVENTS = [];
 let listeners = [];
 
 // TODO: Check w/@ddrscott that we can reasses the event set and event data
@@ -22,8 +24,8 @@ let listeners = [];
 //       - This might suggest that we don't care about EventSets... and
 //         everything is an Event...
 //    2. I suspect there alot of attributes we don't use...
-const mungeEvent = ({ caller, duration, name, sql, time, type }, id) => ({
-  id,
+function mungeEvent({ caller, duration, name, sql, time, type }, id){
+  return {id,
   type,
   sql,
   sqlHash: sql ? stringHash(sql) : 0,
@@ -35,9 +37,10 @@ const mungeEvent = ({ caller, duration, name, sql, time, type }, id) => ({
   color: (
     type === TYPE_ACTIVE_RECORD
       ? COLOR_ACTIVE_RECORD
-      : `hsl(${colorWheelHue(colorIndexer.getIndex(sql))}, 80%, 60%)`
-  )
-});
+      : color(this.getIndex(sql))
+      // : `hsl(${colorWheelHue(colorIndexer.getIndex(sql))}, 80%, 60%)`
+  )}
+};
 
 const mungeEventSet = ({ duration, events, start_time, params: { controller, action } }) => ({
   id: start_time,
@@ -45,7 +48,7 @@ const mungeEventSet = ({ duration, events, start_time, params: { controller, act
   name: `${controller}#${action}`,
   time: (start_time * 1000),
   duration,
-  events: events.map(mungeEvent)
+  events: events.map(mungeEvent, new KeyIndex())
 });
 
 const addEvent = eventSet => {
@@ -55,12 +58,21 @@ const addEvent = eventSet => {
 
 // TODO: not sure why this stopped working after rebasing the latest from master
 // new WebSocket(`ws://${window.location.host}/sql_probe/live/feed`)
-new WebSocket(`ws://localhost:3000/sql_probe/live/feed`)
-  .onmessage = ({ data }) => {
-    if (data.charCodeAt(0) === 123 /* { */) {
-      addEvent(JSON.parse(data));
-    }
-  };
+// new WebSocket(`ws://localhost:3000/sql_probe/live/feed`)
+//   .onmessage = ({ data }) => {
+//     if (data.charCodeAt(0) === 123 /* { */) {
+//       addEvent(JSON.parse(data));
+//     }
+//   };
+
+setTimeout(() => {
+  MOCK_EVENTS.forEach(addEvent);
+});
+
+// setTimeout(() => {
+//   events.push(...MOCK_EVENTS);
+//   listeners.forEach(l => l(events));
+// }, 200);
 
 export default {
   events,

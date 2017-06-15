@@ -40,6 +40,7 @@ export default class App extends Component {
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         {/* DEVELOPMENT ONLY: REMOVE ME */}
         <PanelSplit
+          initialSize={250}
           a={height =>
             <EventTimeline
               onSelect={this.handleSelect}

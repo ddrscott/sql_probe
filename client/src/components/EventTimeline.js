@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './EventTimeline.css';
 import ProbeEvents, { TYPE_SQL } from '../services/ProbeEvents';
+import { Manager, Target, Popper, Arrow } from 'react-popper';
 
 const MARGIN = 4;
 const GROUP_MARGIN = MARGIN * 2;
@@ -10,8 +11,15 @@ const ROW_HEIGHT_WITH_MARGIN = ROW_HEIGHT + MARGIN * 2;
 const VIEW_MARGIN_MS = 10;
 
 class Event extends Component {
+  componentDidMount() {
+    const { props: { event } } = this;
+    if (event.model.sqlHash === 2984530432 && event.x === 469.2900390625) {
+      this.onMouseEnterLeave({ type: 'mouseenter' });
+    }
+  }
+
   shouldComponentUpdate({ event, isSelected }){
-    const { props } = this;
+    const { props, state } = this;
     return (
       event !== props.event
       || isSelected !== props.isSelected
@@ -26,42 +34,76 @@ class Event extends Component {
     }
   }
 
+  onMouseEnterLeave = ({ type }) => {
+    const { portaler} = this.props;
+    if (type === 'mouseenter') {
+      const { groupX, event: { model, x, y, width, height } } = this.props;
+      portaler(
+        <foreignObject
+          width="400"
+          height="100"
+        >
+          <div className='EventTimeline-itemTooltip' style={{ borderColor: model.color }} >
+            <div className='EventTimeline-itemTooltipBorder' style={{ backgroundColor: model.color }} />
+            {model.name} {model.sql}
+          </div>
+        </foreignObject>,
+        (groupX + x + width / 2),
+        y + height / 2
+      );
+    }
+    else {
+      portaler(null, 0, 0);
+    }
+  }
+
   render() {
     const { event: { model, x, y, width, height }, isSelected} = this.props;
     return (
-      <rect
-        data-sqlhash={model.sqlHash}
-        x={x} y={y}
-        width={width}
-        className={
-          `EventTimeline-item ${
-            isSelected ? 'is-selected' : ''
-          } ${
-            model.isCached ? 'is-cached' : ''
-          }`
-        }
-        style={{ color: model.color, height: `${height}px` }}
-        fill={model.color}
-        onClick={this.onClick}
-      />
+      <g onMouseEnter={this.onMouseEnterLeave} onMouseLeave={this.onMouseEnterLeave} >
+        <rect
+          data-sqlhash={model.sqlHash}
+          x={x} y={y}
+          width={width}
+          height={height}
+          className={
+            `EventTimeline-item ${
+              isSelected ? 'is-selected' : ''
+            } ${
+              model.isCached ? 'is-cached' : ''
+            }`
+          }
+          style={{ color: model.color }}
+          fill={model.color}
+          onClick={this.onClick}
+        />
+      </g>
     );
   }
 }
 
-const Group = ({ group: { events, model, x, width }, onClick, selectedEvent, unscaledViewBox }) => (
+const Group = ({ group: { events, model, x, width }, onClick, portaler, selectedEvent, unscaledViewBox }) => (
   <g transform={`translate(${x})`}>
     <rect
       className='EventTimeline-item EventTimeline-item--group'
       width={width}
+      height={20}
       x='0' y={GROUP_MARGIN}
     />
     <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
-      <text x='4' y={GROUP_MARGIN + 12 + 2} fontSize={12}>
+      <text className='EventTimeline-groupLabel' x='4' y={GROUP_MARGIN + 12 + 2}>
         {model.name}
       </text>
     </svg>
     {events.map(event =>
-      <Event event={event} isSelected={selectedEvent === event.model} key={event.model.id} onClick={onClick} />
+      <Event
+        event={event}
+        groupX={x}
+        isSelected={selectedEvent === event.model}
+        key={event.model.id}
+        onClick={onClick}
+        portaler={portaler}
+      />
     )}
   </g>
 )
@@ -77,7 +119,7 @@ class Groups extends Component {
   }
 
   render() {
-    const { groups, onClick, unscaledViewBox, selectedEvent } = this.props;
+    const { groups, onClick, portaler, unscaledViewBox, selectedEvent } = this.props;
     return (
       <g>
         {groups.map(group =>
@@ -87,6 +129,7 @@ class Groups extends Component {
             selectedEvent={selectedEvent}
             key={group.model.id}
             unscaledViewBox={unscaledViewBox}
+            portaler={portaler}
           />
         )}
       </g>
@@ -217,6 +260,50 @@ function VisibleElement(pct, event) {
   this.visibleDuration = pct * event.duration;
 }
 
+const Tooltip = ({ x, y, content, unscaledViewBox }) => {
+  return (
+    <g transform={`translate(${x}, ${y})`}>
+      <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
+        {content}
+      </svg>
+    </g>
+  );
+};
+
+const Portal = () => {
+  let destComp = null;
+  class PortalDestination extends Component {
+    constructor() {
+      super();
+      this.state = { traveler: null };
+    }
+    componentWillMount() {
+      destComp = this;
+    }
+    setTraveler(traveler, x, y) {
+      this.setState({ traveler, x, y });
+    }
+    render(){
+      const { unscaledViewBox } = this.props;
+      const { traveler, x, y } = this.state;
+      return (
+        <g transform={`translate(${x}, ${y})`}>
+          <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
+            {traveler}
+          </svg>
+        </g>
+      );
+    }
+  };
+
+  return {
+    PortalDestination,
+    portaler: (traveler, x, y) => {
+      if (destComp) destComp.setTraveler(traveler, x, y);
+    }
+  };
+}
+
 export default class EventTimeline extends Component {
   constructor() {
     super();
@@ -227,7 +314,8 @@ export default class EventTimeline extends Component {
       size: [ 0, 0 ],
       unscaledViewBox: '0 0 0 0',
       selectedEvent: null,
-      hoveredSql: null
+      hoveredSql: null,
+      portal: Portal()
     };
 
     ProbeEvents.on(this.handleEventsUpdated);
@@ -385,12 +473,13 @@ export default class EventTimeline extends Component {
   onMouseOut = e => this.setState({ hoveredSql: null })
 
   render() {
-    const { hoveredSql } = this.props;
+    const { hoveredSql: propHoveredSql } = this.props;
     const {
       groups, hoveredSql: stateHoveredSql, max, min, selectedEvent,
-      unscaledViewBox, viewX, viewWidth, size: [ width, height ]
+      unscaledViewBox, viewX, viewWidth, size: [ width, height ],
+      portal: { PortalDestination, portaler }
     } = this.state;
-    const finalHoveredSql = stateHoveredSql || hoveredSql;
+    const hoveredSql = stateHoveredSql || propHoveredSql;
 
     return (
       <div className='EventTimeline'>
@@ -399,17 +488,6 @@ export default class EventTimeline extends Component {
           className='EventTimeline-resizeDetector'
           ref={this.onResizeDetectorMounted}
         />
-        { finalHoveredSql &&
-          <style>{`
-            .EventTimeline-item[data-sqlhash='${finalHoveredSql}'] {
-              stroke: currentColor;
-              stroke-opacity: 1;
-            }
-            .EventTimeline-item[data-sqlhash='${finalHoveredSql}'].is-cached {
-              stroke-opacity: 0.5;
-            }
-          `}</style>
-        }
         <svg
           className='EventTimeline-svg'
           onWheel={this.onWheelEvent}
@@ -427,6 +505,7 @@ export default class EventTimeline extends Component {
               unscaledViewBox={unscaledViewBox}
               onClick={this.onEventSelected}
               selectedEvent={selectedEvent}
+              portaler={portaler}
             />
           </g>
           <GridLines
@@ -436,7 +515,33 @@ export default class EventTimeline extends Component {
             viewX={viewX}
             unscaledViewBox={unscaledViewBox}
           />
+          <g transform='translate(0, 20)'>
+            <PortalDestination
+              unscaledViewBox={unscaledViewBox}
+            />
+          </g>
         </svg>
+        { hoveredSql &&
+          <style>{`
+            .EventTimeline-item:not([data-sqlhash='${hoveredSql}']) {
+              opacity: 0.1;
+            }
+            .EventTimeline-item.EventTimeline-item--group:not([data-sqlhash='${hoveredSql}']) {
+              opacity: 1;
+            }
+            .EventTimeline-item[data-sqlhash='${hoveredSql}'] {
+              stroke: currentColor;
+            }
+            .EventTimeline-item[data-sqlhash='${hoveredSql}']:hover {
+              opacity: 1;
+              stroke-opacity: 1;
+              fill-opacity: 1;
+            }
+            .EventTimeline-item[data-sqlhash='${hoveredSql}'].is-cached {
+              stroke-opacity: 0.5;
+            }
+          `}</style>
+        }
       </div>
     );
   }

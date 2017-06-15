@@ -2,6 +2,7 @@
   shape-rendering: optimizeSpeed;
   overflow: hidden;
   transform: translateZ(0);
+  font-size: 12px;
 }
 
 .EventTimeline,
@@ -27,9 +28,32 @@
   z-index: -1;
 }
 
+.EventTimeline-itemTooltip {
+  cursor: pointer;
+  width: 100%;
+  max-height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: white;
+  padding: 10px;
+  border-radius: 3px;
+  border: 1px solid gray;
+  position: fixed;
+  transform: translateX(-50%);
+}
+.EventTimeline-itemTooltipBorder {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: red;
+  z-index: -1;
+  opacity: 0.1;
+}
+
 .EventTimeline-item {
   cursor: pointer;
-  height: 20px;
   stroke: white;
   stroke-width: 4;
   stroke-opacity: 0;
@@ -41,13 +65,14 @@
   stroke-opacity: 1;
 }
 
+.EventTimeline-item.is-selected:hover,
 .EventTimeline-item.is-selected {
   stroke: #0088ff;
   stroke-opacity: 1;
 }
 
 .EventTimeline-item.is-cached {
-  fill-opacity: 0.5;
+  fill-opacity: 0.2;
 }
 
 .EventTimeline-item--group {
@@ -61,6 +86,6 @@
   vector-effect: non-scaling-stroke;
 }
 
-.EventTimeline-gridLineLabel {
-  font-size: 12px;
+.EventTimeline-groupLabel {
+  pointer-events: none;
 }
