@@ -1,7 +1,6 @@
-import React, { Component } from 'react';
 import './EventTimeline.css';
+import React, { Component } from 'react';
 import ProbeEvents, { TYPE_SQL } from '../services/ProbeEvents';
-import { Manager, Target, Popper, Arrow } from 'react-popper';
 
 const MARGIN = 4;
 const GROUP_MARGIN = MARGIN * 2;
@@ -11,15 +10,8 @@ const ROW_HEIGHT_WITH_MARGIN = ROW_HEIGHT + MARGIN * 2;
 const VIEW_MARGIN_MS = 10;
 
 class Event extends Component {
-  componentDidMount() {
-    const { props: { event } } = this;
-    if (event.model.sqlHash === 2984530432 && event.x === 469.2900390625) {
-      this.onMouseEnterLeave({ type: 'mouseenter' });
-    }
-  }
-
   shouldComponentUpdate({ event, isSelected }){
-    const { props, state } = this;
+    const { props } = this;
     return (
       event !== props.event
       || isSelected !== props.isSelected
@@ -35,9 +27,8 @@ class Event extends Component {
   }
 
   onMouseEnterLeave = ({ type }) => {
-    const { portaler} = this.props;
+    const { portaler, groupX, event: { model, x, y, width, height } } = this.props;
     if (type === 'mouseenter') {
-      const { groupX, event: { model, x, y, width, height } } = this.props;
       portaler(
         <foreignObject
           width="400"
@@ -255,20 +246,10 @@ const state = eventSets => {
 
 // Note(perf): Purposely a function type as instantation and access faster than
 //             Object literal or Classes at the moment.
-function VisibleElement(pct, event) {
+export function VisibleElement(pct, event) {
   this.event = event;
   this.visibleDuration = pct * event.duration;
 }
-
-const Tooltip = ({ x, y, content, unscaledViewBox }) => {
-  return (
-    <g transform={`translate(${x}, ${y})`}>
-      <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
-        {content}
-      </svg>
-    </g>
-  );
-};
 
 const Portal = () => {
   let destComp = null;
@@ -307,34 +288,36 @@ const Portal = () => {
 export default class EventTimeline extends Component {
   constructor() {
     super();
-    this.state = {
-      ...state([]),
-      viewX: 0,
-      viewWidth: 0,
-      size: [ 0, 0 ],
-      unscaledViewBox: '0 0 0 0',
-      selectedEvent: null,
-      hoveredSql: null,
-      portal: Portal()
-    };
-
     ProbeEvents.on(this.handleEventsUpdated);
   }
+
+  state = {
+    ...state([]),
+    viewX: 0,
+    viewWidth: 0,
+    size: [ 0, 0 ],
+    unscaledViewBox: '0 0 0 0',
+    selectedEvent: null,
+    portal: Portal()
+  };
 
   handleEventsUpdated = eventSets => {
     this.setState(state(eventSets), this.updateVisibleElements);
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    const { eventSets, hoveredSql, selectedEvent, viewX, viewWidth, unscaledViewBox } = this.state;
+    const { hoveredSql } = this.props;
+    const { eventSets, selectedEvent, viewX, viewWidth, unscaledViewBox } = this.state;
     return (
+    // State
        eventSets !== nextState.eventSets
     || viewX !== nextState.viewX
     || viewWidth !== nextState.viewWidth
     || unscaledViewBox !== nextState.unscaledViewBox
     || selectedEvent !== nextState.selectedEvent
-    || hoveredSql !== nextState.hoveredSql
-    || this.props.hoveredSql !== nextProps.hoveredSql
+
+    // Props
+    || hoveredSql !== nextProps.hoveredSql
     );
   }
 
@@ -469,17 +452,16 @@ export default class EventTimeline extends Component {
   }
 
   onClearSelectedEvent = () => this.onEventSelected(null)
-  onMouseOver = ({ target }) => this.setState({ hoveredSql: target.dataset.sqlhash })
-  onMouseOut = e => this.setState({ hoveredSql: null })
+  onMouseOver = ({ target }) => this.props.onHoverSql(target.dataset.sqlhash)
+  onMouseOut = () => this.props.onHoverSql(null)
 
   render() {
-    const { hoveredSql: propHoveredSql } = this.props;
+    const { hoveredSql } = this.props;
     const {
-      groups, hoveredSql: stateHoveredSql, max, min, selectedEvent,
+      groups, max, min, selectedEvent,
       unscaledViewBox, viewX, viewWidth, size: [ width, height ],
       portal: { PortalDestination, portaler }
     } = this.state;
-    const hoveredSql = stateHoveredSql || propHoveredSql;
 
     return (
       <div className='EventTimeline'>
@@ -499,6 +481,7 @@ export default class EventTimeline extends Component {
           onMouseOver={this.onMouseOver}
           onMouseOut={this.onMouseOut}
         >
+          {/* TODO: Remove translate move it into the event/group positioning */}
           <g transform='translate(0, 20)'>
             <Groups
               groups={groups}
@@ -516,9 +499,7 @@ export default class EventTimeline extends Component {
             unscaledViewBox={unscaledViewBox}
           />
           <g transform='translate(0, 20)'>
-            <PortalDestination
-              unscaledViewBox={unscaledViewBox}
-            />
+            <PortalDestination unscaledViewBox={unscaledViewBox} />
           </g>
         </svg>
         { hoveredSql &&

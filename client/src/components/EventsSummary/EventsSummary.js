@@ -2,7 +2,7 @@ import '../../css/flex.css';
 import './EventsSummary.css';
 import React, { Component } from 'react';
 import Tabs from '../Tabs';
-import SummaryTab from './SummaryTab2';
+import SummaryTab from './SummaryTab';
 import PivotTab from './PivotTab';
 
 const TABS = [ 'Summary', 'Pivot' ];

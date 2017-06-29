@@ -4,20 +4,15 @@
 
 ## Timeline
 
+- Refactor: into a directory and break out sub components
 - Controller endpoint name bleeds outside of the box
-- On hover, event tooltip
-- With a large number SQL queries, alot of wasted visual space (stairway to hell)
-  - Idea #1: Only Queries with **multiple** occurrences get their own row?
 - Initial zoom level seems doesn't seem to zoom in on the data set
 - "Sticky" event set (controller name)
   - currently the controller name scrolls out of view
 
-
 ## Summary
 
-- Breakdown of tables
-- Tooltip is cutoff
-
+- Breakdown of accessed SQL tables
 
 ## Details
 

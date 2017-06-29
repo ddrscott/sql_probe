@@ -40,6 +40,7 @@
   border: 1px solid gray;
   position: fixed;
   transform: translateX(-50%);
+  font-family: monospace;
 }
 .EventTimeline-itemTooltipBorder {
   position: absolute;
@@ -72,7 +73,7 @@
 }
 
 .EventTimeline-item.is-cached {
-  fill-opacity: 0.2;
+  fill-opacity: 0.3;
 }
 
 .EventTimeline-item--group {

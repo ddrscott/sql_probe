@@ -6,26 +6,15 @@ import EventTimeline from './components/EventTimeline';
 import PanelSplit from './components/PanelSplit';
 
 export default class App extends Component {
-  constructor(){
-    super();
-    this.state = {
-      hoveredSql: null,
-      selectedEvent: null,
-      visibleEvents: [],
-    };
+  state = {
+    hoveredSql: null,
+    selectedEvent: null,
+    visibleEvents: [],
   }
 
-  handleSelect = selectedEvent => {
-    this.setState({ selectedEvent });
-  }
-
-  handleVisibleEventsChange = visibleEvents => {
-    this.setState({ visibleEvents });
-  }
-
-  onHoverSql = hoveredSql => {
-    this.setState({ hoveredSql });
-  }
+  handleSelect = selectedEvent => { this.setState({ selectedEvent }); }
+  handleVisibleEventsChange = visibleEvents => { this.setState({ visibleEvents }); }
+  onHoverSql = hoveredSql => { this.setState({ hoveredSql }); }
 
   render() {
     const { selectedEvent, visibleEvents, hoveredSql } = this.state;
@@ -46,12 +35,17 @@ export default class App extends Component {
               onSelect={this.handleSelect}
               onVisibleChange={this.handleVisibleEventsChange}
               hoveredSql={hoveredSql}
+              onHoverSql={this.onHoverSql}
             />
           }
           b={
             selectedEvent
               ? <EventDetails event={selectedEvent} />
-              : <EventsSummary visibleEvents={visibleEvents} onHoverSql={this.onHoverSql} />
+              : <EventsSummary
+                  visibleEvents={visibleEvents}
+                  onHoverSql={this.onHoverSql}
+                  hoveredSql={hoveredSql}
+                />
           }
         />
       </div>
