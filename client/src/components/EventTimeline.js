@@ -268,7 +268,7 @@ const Portal = () => {
       const { unscaledViewBox } = this.props;
       const { traveler, x, y } = this.state;
       return (
-        <g transform={`translate(${x}, ${y})`}>
+        <g transform={(x !== undefined && y !== undefined) ? `translate(${x}, ${y})` : ''}>
           <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
             {traveler}
           </svg>

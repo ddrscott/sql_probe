@@ -1,4 +1,4 @@
-import MOCK_EVENTS from './MOCK_ProbeEvents';
+// import MOCK_EVENTS from './MOCK_ProbeEvents';
 
 import KeyIndex from '../utils/KeyIndex';
 import color from '../utils/colorWheelHue';
@@ -14,7 +14,6 @@ export const COLOR_SQL = '#36A2EB';
 export const COLOR_CONTROLLER = '#FF6384';
 export const COLOR_OTHER = '#E8E8E8';
 
-// const colorIndexer = new KeyIndex();
 const events = window.EVENTS = [];
 let listeners = [];
 
@@ -38,7 +37,6 @@ function mungeEvent({ caller, duration, name, sql, time, type }, id){
     type === TYPE_ACTIVE_RECORD
       ? COLOR_ACTIVE_RECORD
       : color(this.getIndex(sql))
-      // : `hsl(${colorWheelHue(colorIndexer.getIndex(sql))}, 80%, 60%)`
   )}
 };
 
@@ -56,23 +54,15 @@ const addEvent = eventSet => {
   listeners.forEach(l => l(events));
 }
 
-// TODO: not sure why this stopped working after rebasing the latest from master
-// new WebSocket(`ws://${window.location.host}/sql_probe/live/feed`)
-// new WebSocket(`ws://localhost:3000/sql_probe/live/feed`)
-//   .onmessage = ({ data }) => {
-//     if (data.charCodeAt(0) === 123 /* { */) {
-//       addEvent(JSON.parse(data));
-//     }
-//   };
-
-setTimeout(() => {
-  MOCK_EVENTS.forEach(addEvent);
-});
-
 // setTimeout(() => {
-//   events.push(...MOCK_EVENTS);
-//   listeners.forEach(l => l(events));
-// }, 200);
+//   MOCK_EVENTS.forEach(addEvent);
+// });
+new WebSocket(`ws://${window.location.host}/sql_probe/live/feed`)
+  .onmessage = ({ data }) => {
+    if (data.charCodeAt(0) === 123 /* { */) {
+      addEvent(JSON.parse(data));
+    }
+  };
 
 export default {
   events,

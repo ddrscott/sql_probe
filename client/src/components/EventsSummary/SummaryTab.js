@@ -162,7 +162,7 @@ class AggregateRow extends Component {
   }
 }
 
-const renderRow = ({ aggOrItem, depth, onHoverSql, parentDuration }) => {
+const renderRow = ({ aggOrItem, depth, key, onHoverSql, parentDuration }) => {
   // Aggregates with only one event are a single unexpandable row
   const item = (
     (aggOrItem instanceof Aggregate && aggOrItem.items.length === 1)
@@ -173,8 +173,9 @@ const renderRow = ({ aggOrItem, depth, onHoverSql, parentDuration }) => {
   if (item instanceof Aggregate) {
     return (
       <AggregateRow
-        depth={depth}
         aggregate={item}
+        depth={depth}
+        key={key}
         onHoverSql={onHoverSql}
         parentDuration={parentDuration}
       />
@@ -188,6 +189,7 @@ const renderRow = ({ aggOrItem, depth, onHoverSql, parentDuration }) => {
       color={color}
       depth={depth}
       hoverKey={sqlHash}
+      key={key}
       label={sql}
       onHover={onHoverSql}
       ratio={visibleDuration / parentDuration}
