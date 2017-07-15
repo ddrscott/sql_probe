@@ -1,6 +1,8 @@
 import './EventTimeline.css';
 import React, { Component } from 'react';
-import ProbeEvents, { TYPE_SQL } from '../services/ProbeEvents';
+import GridLines from './GridLines';
+import PortalDestination from './PortalDestination';
+import ProbeEvents, { TYPE_SQL } from '../../services/ProbeEvents';
 
 const MARGIN = 4;
 const GROUP_MARGIN = MARGIN * 2;
@@ -10,60 +12,73 @@ const ROW_HEIGHT_WITH_MARGIN = ROW_HEIGHT + MARGIN * 2;
 const VIEW_MARGIN_MS = 10;
 
 class Event extends Component {
-  shouldComponentUpdate({ event, isSelected }){
+  shouldComponentUpdate({ model, isSelected }){
     const { props } = this;
     return (
-      event !== props.event
-      || isSelected !== props.isSelected
+       model !== props.model
+    || isSelected !== props.isSelected
     )
   }
 
   onClick = e => {
-    const { onClick, event } = this.props;
+    const { onClick, model } = this.props;
     if (onClick) {
       e.stopPropagation();
-      onClick(event.model);
+      onClick(model);
     }
   }
 
   onMouseEnterLeave = ({ type }) => {
-    const { portaler, groupX, event: { model, x, y, width, height } } = this.props;
+    const { onPortal, groupX, model } = this.props;
     if (type === 'mouseenter') {
-      portaler(
-        <foreignObject
-          width="400"
-          height="100"
-        >
+      onPortal(
+        <foreignObject width="400" height="100">
           <div className='EventTimeline-itemTooltip' style={{ borderColor: model.color }} >
             <div className='EventTimeline-itemTooltipBorder' style={{ backgroundColor: model.color }} />
             {model.name} {model.sql}
           </div>
         </foreignObject>,
-        (groupX + x + width / 2),
-        y + height / 2
+        (groupX + this.x + this.width / 2),
+        20 + this.y + this.height / 2
       );
     }
     else {
-      portaler(null, 0, 0);
+      onPortal(null, 0, 0);
     }
   }
 
+  get width() { return this.props.model.durationCeil; }
+
+  get x() {
+    const { model, groupTime } = this.props;
+    return model.time - groupTime;
+  }
+
+  get y() {
+    return GROUP_MARGIN + ROW_HEIGHT_WITH_MARGIN + (
+      this.props.model.type === TYPE_SQL
+        ? ROW_HEIGHT_WITH_MARGIN
+        : 0
+    )
+  }
+
+  get height() { return ROW_HEIGHT + COUNT_HEIGHT_INCREMENT * this.props.model.count; }
+
   render() {
-    const { event: { model, x, y, width, height }, isSelected} = this.props;
+    const { model, groupTime, isSelected} = this.props;
+
     return (
       <g onMouseEnter={this.onMouseEnterLeave} onMouseLeave={this.onMouseEnterLeave} >
         <rect
           data-sqlhash={model.sqlHash}
-          x={x} y={y}
-          width={width}
-          height={height}
-          className={
-            `EventTimeline-item ${
-              isSelected ? 'is-selected' : ''
-            } ${
-              model.isCached ? 'is-cached' : ''
-            }`
-          }
+          x={this.x} y={this.y}
+          width={this.width}
+          height={this.height}
+          className={`
+            EventTimeline-item
+            ${isSelected ? 'is-selected' : ''}
+            ${model.isCached ? 'is-cached' : ''}
+          `}
           style={{ color: model.color }}
           fill={model.color}
           onClick={this.onClick}
@@ -73,12 +88,11 @@ class Event extends Component {
   }
 }
 
-const Group = ({ group: { events, model, x, width }, onClick, portaler, selectedEvent, unscaledViewBox }) => (
-  <g transform={`translate(${x})`}>
+const Group = ({ model, minX, onClick, onPortal, selectedEvent, unscaledViewBox }) => (
+  <g transform={`translate(${model.time - minX})`}>
     <rect
       className='EventTimeline-item EventTimeline-item--group'
-      width={width}
-      height={20}
+      width={model.durationCeil} height='20'
       x='0' y={GROUP_MARGIN}
     />
     <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
@@ -86,104 +100,48 @@ const Group = ({ group: { events, model, x, width }, onClick, portaler, selected
         {model.name}
       </text>
     </svg>
-    {events.map(event =>
+    {model.events.map(event =>
       <Event
-        event={event}
-        groupX={x}
-        isSelected={selectedEvent === event.model}
-        key={event.model.id}
+        model={event}
+        groupTime={model.time}
+        groupX={model.time - minX}
+        isSelected={selectedEvent === event}
+        key={event.id}
         onClick={onClick}
-        portaler={portaler}
+        onPortal={onPortal}
       />
     )}
   </g>
 )
 
 class Groups extends Component {
-  shouldComponentUpdate({ groups, selectedEvent, unscaledViewBox }) {
+  shouldComponentUpdate({ groups, minX, selectedEvent, unscaledViewBox }) {
     const { props } = this;
     return (
        groups !== props.groups
     || unscaledViewBox !== props.unscaledViewBox
     || selectedEvent !== props.selectedEvent
+    || minX !== props.minX
     );
   }
 
   render() {
-    const { groups, onClick, portaler, unscaledViewBox, selectedEvent } = this.props;
+    const { groups, minX, onClick, onPortal, unscaledViewBox, selectedEvent } = this.props;
     return (
-      <g>
+      <g transform='translate(0, 20)'>
         {groups.map(group =>
           <Group
-            group={group}
+            model={group}
+            key={group.id}
+            minX={minX}
             onClick={onClick}
+            onPortal={onPortal}
             selectedEvent={selectedEvent}
-            key={group.model.id}
             unscaledViewBox={unscaledViewBox}
-            portaler={portaler}
           />
         )}
       </g>
     )
-  }
-}
-
-class GridLines extends Component {
-  shouldComponentUpdate({ viewWidth, viewX, unscaledViewBox }) {
-    const { props } = this;
-    let dividerWidth, prevDividerWidth;
-    return (
-       unscaledViewBox !== props.unscaledViewBox
-    || (dividerWidth = this.dividerWidth(viewWidth)) !== (prevDividerWidth = this.dividerWidth(props.viewWidth))
-    || this.firstGridX(viewX, dividerWidth) !== this.firstGridX(props.viewX, prevDividerWidth)
-    || this.lastGridX(viewX, viewWidth, dividerWidth) !== this.lastGridX(props.viewX, props.viewWidth, prevDividerWidth)
-    );
-  }
-
-  dividerWidth(viewWidth) {
-    const order = Math.log10(viewWidth / 3.0);
-    const lowerOrder = Math.floor(order);
-    // Determine whether divder width should be half step (ex. 5, 50, 500, ...)
-    const result = Math.pow(10.0, lowerOrder) * (0.69897 < order - lowerOrder  ? 5.0 : 1.0);
-    return Math.max(5.0, result);
-  }
-
-  firstGridX(viewX, dividerWidth) {
-    return Math.ceil(viewX / dividerWidth) * dividerWidth;
-  }
-
-  lastGridX(viewX, viewWidth, dividerWidth) {
-    return Math.ceil((viewX + viewWidth) / dividerWidth) * dividerWidth;
-  }
-
-  render() {
-    const { props: { unscaledViewBox, viewX, viewWidth } } = this;
-    const dividerWidth = this.dividerWidth(viewWidth);
-    const gridLines = [];
-    const lastGridX = this.lastGridX(viewX, viewWidth, dividerWidth);
-    let i=0;
-    for (let x = this.firstGridX(viewX, dividerWidth); x < lastGridX; x += dividerWidth) {
-      gridLines.push(
-        <g key={i++} transform={`translate(${x})`}>
-          <line
-            className='EventTimeline-gridLine'
-            x1='0' y1='0'
-            x2='0' y2='100%'
-          />
-          <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
-            <text
-              alignmentBaseline='hanging'
-              className='EventTimeline-gridLineLabel'
-              x='5' y='5'
-            >
-              {x} ms
-            </text>
-          </svg>
-        </g>
-      );
-    }
-
-    return <g>{gridLines}</g>;
   }
 }
 
@@ -196,41 +154,29 @@ const overlapPct = (x1, x2, y1, y2) =>
     ) / (x2 - x1)
   );
 
-const eventState = (model, min, sqlToCount) => {
-  const { type, sql, time, duration } = model;
+const eventState = (model, min) => {
+  const { type, time, durationCeil, count } = model;
   const y = GROUP_MARGIN + ROW_HEIGHT_WITH_MARGIN + (
     type === TYPE_SQL
       ? ROW_HEIGHT_WITH_MARGIN
       : 0
   );
-  const sqlCount = (
-    type === TYPE_SQL
-      ? sqlToCount.get(sql)
-      : 0
-  )
   return {
     model,
-    width: Math.ceil(duration),
-    height: ROW_HEIGHT + COUNT_HEIGHT_INCREMENT * sqlCount,
+    width: durationCeil,
+    height: ROW_HEIGHT + COUNT_HEIGHT_INCREMENT * count,
     x: time - min,
     y
   };
 }
 
 const groupState = (model, min) => {
-  const { time, duration, events } = model;
-  const sqlToCount = new Map();
-  events
-    .filter(e => e.type === TYPE_SQL)
-    .forEach(({ sql }) => {
-      sqlToCount.set(sql, (sqlToCount.get(sql) || 0) + 1)
-    });
-
+  const { time, durationCeil, events } = model;
   return {
     model,
-    width: Math.ceil(duration),
+    width: durationCeil,
     x: time - min,
-    events: events.map(e => eventState(e, time, sqlToCount))
+    events: events.map(e => eventState(e, time))
   };
 }
 
@@ -240,66 +186,30 @@ const state = eventSets => {
   return {
     eventSets,
     groups: eventSets.map(es => groupState(es, min)),
-    maxViewWidth: max - min
+    maxViewWidth: max - min,
+    minX: min
   };
 }
 
-// Note(perf): Purposely a function type as instantation and access faster than
-//             Object literal or Classes at the moment.
-export function VisibleElement(pct, event) {
-  this.event = event;
-  this.visibleDuration = pct * event.duration;
-}
-
-const Portal = () => {
-  let destComp = null;
-  class PortalDestination extends Component {
-    constructor() {
-      super();
-      this.state = { traveler: null };
-    }
-    componentWillMount() {
-      destComp = this;
-    }
-    setTraveler(traveler, x, y) {
-      this.setState({ traveler, x, y });
-    }
-    render(){
-      const { unscaledViewBox } = this.props;
-      const { traveler, x, y } = this.state;
-      return (
-        <g transform={(x !== undefined && y !== undefined) ? `translate(${x}, ${y})` : ''}>
-          <svg preserveAspectRatio='none' viewBox={unscaledViewBox}>
-            {traveler}
-          </svg>
-        </g>
-      );
-    }
-  };
-
-  return {
-    PortalDestination,
-    portaler: (traveler, x, y) => {
-      if (destComp) destComp.setTraveler(traveler, x, y);
-    }
-  };
+export const VisibleElement = class {
+  constructor(pct, event) {
+    this.event = event;
+    this.visibleDuration = pct * event.duration;
+  }
 }
 
 export default class EventTimeline extends Component {
-  constructor() {
-    super();
-    ProbeEvents.on(this.handleEventsUpdated);
-  }
-
   state = {
     ...state([]),
     viewX: 0,
     viewWidth: 0,
     size: [ 0, 0 ],
     unscaledViewBox: '0 0 0 0',
-    selectedEvent: null,
-    portal: Portal()
-  };
+    selectedEvent: null
+  }
+
+  componentDidMount(){ ProbeEvents.on(this.handleEventsUpdated); }
+  componentWillUnmount(){ ProbeEvents.off(this.handleEventsUpdated); }
 
   handleEventsUpdated = eventSets => {
     this.setState(state(eventSets), this.updateVisibleElements);
@@ -332,30 +242,26 @@ export default class EventTimeline extends Component {
     if ( typeof onVisibleChange !== 'function' ) return;
 
     const items = [];
-    const { viewX, viewWidth, groups } = this.state;
+    // TODO: Remove dependency on groups and groups.events
+    const { minX, viewX, viewWidth, groups } = this.state;
     const maxX = viewX + viewWidth;
-    let groupX, groupMaxX, x, width, model, events, j, pct;
 
     for(let i = 0; i < groups.length; ++i) {
-      ({ model, x:groupX, width, events } = groups[i]);
-      groupMaxX = groupX + width;
-      pct = overlapPct(groupX, groupMaxX, viewX, maxX);
+      const { model, x:groupX, width, events } = groups[i];
+      const pct = overlapPct(groupX, groupX + width, viewX, maxX);
 
       if (pct > 0.0) {
         items.push(new VisibleElement(pct, model));
 
-        if (pct === 1.0) {
-          for(j = 0; j < events.length; ++j) {
-            items.push(new VisibleElement(1.0, events[j].model));
+        for(let j = 0; j < events.length; j++) {
+          const { model:eventModel, x, width:eventWidth } = events[j];
+          if (pct === 1.0) {
+            items.push(new VisibleElement(1.0, eventModel));
           }
-        }
-        else {
-          for(j = 0; j < events.length; ++j) {
-            ({ model, x, width } = events[j]);
-            x += groupX;
-            pct = overlapPct(x, (x + width), viewX, maxX);
-            if (pct > 0.0) {
-              items.push(new VisibleElement(pct, model));
+          else {
+            const eventPct = overlapPct((x + groupX), (x + groupX + eventWidth), viewX, maxX);
+            if (eventPct > 0.0) {
+              items.push(new VisibleElement(eventPct, eventModel));
             }
           }
         }
@@ -376,7 +282,6 @@ export default class EventTimeline extends Component {
       unscaledViewBox: `0 0 ${width} ${height}`
     });
   }
-
 
   scrollHoriz(amt) {
     const { maxViewWidth, viewX, viewWidth } = this.state;
@@ -420,17 +325,11 @@ export default class EventTimeline extends Component {
     }, this.updateVisibleElements);
   }
 
-  onWheelEvent = ({ nativeEvent }) => {
-    const { deltaY, deltaX, clientX } = nativeEvent;
-    nativeEvent.preventDefault();
-
-    // Prevent scrolling and zooming at the same time.
-    // Favor the operation that has most motion towards.
-    if (deltaX !== 0 && Math.abs(deltaX / deltaY) > 2.0) this.scrollHoriz(deltaX);
-    else this.scrollVert(deltaY, clientX);
+  onPortalDestinationMounted = portalDestination => {
+    this.portalDestination = portalDestination;
   }
 
-  onResizeDetectorMounted = (resizeDetector) => {
+  onResizeDetectorMounted = resizeDetector => {
     const prev = this.resizeDetector;
     this.resizeDetector = resizeDetector;
     if (resizeDetector) {
@@ -440,6 +339,15 @@ export default class EventTimeline extends Component {
     else {
       prev.contentWindow.removeEventListener('resize', this.updateSize);
     }
+  }
+  onWheelEvent = ({ nativeEvent }) => {
+    const { deltaY, deltaX, clientX } = nativeEvent;
+    nativeEvent.preventDefault();
+
+    // Prevent scrolling and zooming at the same time.
+    // Favor the operation that has most motion towards.
+    if (deltaX !== 0 && Math.abs(deltaX / deltaY) > 2.0) this.scrollHoriz(deltaX);
+    else this.scrollVert(deltaY, clientX);
   }
 
   onEventSelected = selectedEvent => {
@@ -454,13 +362,15 @@ export default class EventTimeline extends Component {
   onClearSelectedEvent = () => this.onEventSelected(null)
   onMouseOver = ({ target }) => this.props.onHoverSql(target.dataset.sqlhash)
   onMouseOut = () => this.props.onHoverSql(null)
+  onPortal = (traveler, x, y) => {
+    this.portalDestination.setTraveler(traveler, x, y);
+  }
 
   render() {
     const { hoveredSql } = this.props;
     const {
-      groups, max, min, selectedEvent,
-      unscaledViewBox, viewX, viewWidth, size: [ width, height ],
-      portal: { PortalDestination, portaler }
+      eventSets, groups, max, min, minX, selectedEvent,
+      unscaledViewBox, viewX, viewWidth, size: [ width, height ]
     } = this.state;
 
     return (
@@ -470,39 +380,40 @@ export default class EventTimeline extends Component {
           className='EventTimeline-resizeDetector'
           ref={this.onResizeDetectorMounted}
         />
-        <svg
-          className='EventTimeline-svg'
-          onWheel={this.onWheelEvent}
-          preserveAspectRatio='none'
-          viewBox={`${viewX} 0 ${viewWidth} ${height}`}
-          width={width}
-          height={height}
-          onClick={this.onClearSelectedEvent}
-          onMouseOver={this.onMouseOver}
-          onMouseOut={this.onMouseOut}
-        >
-          {/* TODO: Remove translate move it into the event/group positioning */}
-          <g transform='translate(0, 20)'>
+        <svg className='EventTimeline-containerSvg' onWheel={this.onWheelEvent} viewBox={unscaledViewBox} width={width} height={height}>
+          <svg
+            className='EventTimeline-svg'
+            preserveAspectRatio='none'
+            viewBox={`${viewX} 0 ${viewWidth} ${height}`}
+            width={width}
+            height={height}
+            onClick={this.onClearSelectedEvent}
+            onMouseOver={this.onMouseOver}
+            onMouseOut={this.onMouseOut}
+          >
+            {/* TODO: Remove translate move it into the event/group positioning */}
             <Groups
-              groups={groups}
+              groups={eventSets}
+              minX={minX}
               unscaledViewBox={unscaledViewBox}
               onClick={this.onEventSelected}
               selectedEvent={selectedEvent}
-              portaler={portaler}
+              onPortal={this.onPortal}
             />
-          </g>
-          <GridLines
-            min={min}
-            max={max}
-            viewWidth={viewWidth}
-            viewX={viewX}
-            unscaledViewBox={unscaledViewBox}
-          />
-          <g transform='translate(0, 20)'>
-            <PortalDestination unscaledViewBox={unscaledViewBox} />
-          </g>
+            <GridLines
+              min={min}
+              max={max}
+              viewWidth={viewWidth}
+              viewX={viewX}
+              unscaledViewBox={unscaledViewBox}
+            />
+            <PortalDestination
+              ref={this.onPortalDestinationMounted}
+              unscaledViewBox={unscaledViewBox}
+            />
+          </svg>
         </svg>
-        { hoveredSql &&
+        {hoveredSql != null &&
           <style>{`
             .EventTimeline-item:not([data-sqlhash='${hoveredSql}']) {
               opacity: 0.1;

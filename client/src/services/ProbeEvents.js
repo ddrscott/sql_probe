@@ -1,7 +1,6 @@
-// import MOCK_EVENTS from './MOCK_ProbeEvents';
+import MOCK_EVENTS from './MOCK_ProbeEvents';
 
-import KeyIndex from '../utils/KeyIndex';
-import color from '../utils/colorWheelHue';
+import colorWheelHue from '../utils/colorWheelHue';
 import stringHash from '../utils/stringHash';
 
 export const TYPE_ACTIVE_RECORD = 'instantiation.active_record';
@@ -14,8 +13,16 @@ export const COLOR_SQL = '#36A2EB';
 export const COLOR_CONTROLLER = '#FF6384';
 export const COLOR_OTHER = '#E8E8E8';
 
-const events = window.EVENTS = [];
-let listeners = [];
+let events = [];
+const listeners = new Set();
+
+function EventMeta(index, hash) {
+  this.count = 0;
+  this.index = index;
+  this.hash = hash;
+}
+
+const NON_SQL_META = new EventMeta(0, 0);
 
 // TODO: Check w/@ddrscott that we can reasses the event set and event data
 // sent from the backend.
@@ -23,56 +30,70 @@ let listeners = [];
 //       - This might suggest that we don't care about EventSets... and
 //         everything is an Event...
 //    2. I suspect there alot of attributes we don't use...
-function mungeEvent({ caller, duration, name, sql, time, type }, id){
-  return {id,
-  type,
-  sql,
-  sqlHash: sql ? stringHash(sql) : 0,
-  name,
-  isCached: name === 'CACHE',
-  time: Date.parse(time),
-  duration,
-  caller,
-  color: (
-    type === TYPE_ACTIVE_RECORD
-      ? COLOR_ACTIVE_RECORD
-      : color(this.getIndex(sql))
-  )}
+function mungeEvent({ caller, duration, name, sql, time, type }, id, meta){
+  return {
+    caller,
+    color: (
+      type === TYPE_ACTIVE_RECORD
+        ? COLOR_ACTIVE_RECORD
+        : colorWheelHue(meta.index)
+    ),
+    count: meta.count,
+    duration,
+    durationCeil: Math.ceil(duration),
+    id,
+    isCached: name === 'CACHE',
+    name,
+    sql,
+    sqlHash: meta.hash,
+    time: Date.parse(time),
+    type
+  }
 };
 
-const mungeEventSet = ({ duration, events, start_time, params: { controller, action } }) => ({
-  id: start_time,
-  type: TYPE_CONTROLLER,
-  name: `${controller}#${action}`,
-  time: (start_time * 1000),
-  duration,
-  events: events.map(mungeEvent, new KeyIndex())
-});
+const mungeEventSet = ({ duration, events, start_time, params: { controller, action } }) => {
+  let index = 0;
+  const sqlToMeta = new Map([[undefined, NON_SQL_META]]);
+  events
+    .filter(e => e.type === TYPE_SQL)
+    .forEach(({ sql }) => {
+      let meta = sqlToMeta.get(sql);
+      if (meta === undefined){
+        meta = new EventMeta(index++, stringHash(sql));
+        sqlToMeta.set(sql, meta);
+      }
+      meta.count++;
+    });
+
+  return {
+    duration,
+    durationCeil: Math.ceil(duration),
+    events: events.map((event, i) => mungeEvent(event, i, sqlToMeta.get(event.sql))),
+    id: start_time,
+    name: `${controller}#${action}`,
+    time: start_time * 1000,
+    type: TYPE_CONTROLLER
+  }
+};
 
 const addEvent = eventSet => {
-  events.push(mungeEventSet(eventSet));
-  listeners.forEach(l => l(events));
+  events = events.concat(mungeEventSet(eventSet));
+  for(let l of listeners) {
+    l(events);
+  }
 }
 
-// setTimeout(() => {
-//   MOCK_EVENTS.forEach(addEvent);
-// });
-new WebSocket(`ws://${window.location.host}/sql_probe/live/feed`)
-  .onmessage = ({ data }) => {
-    if (data.charCodeAt(0) === 123 /* { */) {
-      addEvent(JSON.parse(data));
-    }
-  };
+setTimeout(() => MOCK_EVENTS.forEach(addEvent));
+// new WebSocket(`ws://${window.location.host}/sql_probe/live/feed`)
+//   .onmessage = ({ data }) => {
+//     if (data.charCodeAt(0) === 123 /* { */) {
+//       addEvent(JSON.parse(data));
+//     }
+//   };
 
 export default {
   events,
-
-  on(l) {
-    if (listeners.indexOf(l) === -1) {
-      listeners.push(l);
-    }
-  },
-
-  off(l) { listeners = listeners.filter(lb => lb !== l); }
+  on: l => listeners.add(l),
+  off: l => listeners.delete(l)
 }
 

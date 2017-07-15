@@ -1,16 +1,15 @@
 .EventTimeline svg {
   shape-rendering: optimizeSpeed;
+  text-rendering: optimizeSpeed;
   overflow: hidden;
   transform: translateZ(0);
   font-size: 12px;
 }
 
-.EventTimeline,
-.EventTimeline-svg,
-.EventTimeline-resizeDetector {
+.EventTimeline {
   position: relative;
   overflow: hidden;
-  background-color: white;
+  contain: layout;
 }
 
 .EventTimeline,
@@ -26,6 +25,8 @@
   background-color: transparent;
   opacity: 0;
   z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
 }
 
 .EventTimeline-itemTooltip {
@@ -42,13 +43,13 @@
   transform: translateX(-50%);
   font-family: monospace;
 }
+
 .EventTimeline-itemTooltipBorder {
   position: absolute;
   left: 0;
   right: 0;
   top: 0;
   bottom: 0;
-  background: red;
   z-index: -1;
   opacity: 0.1;
 }
@@ -78,13 +79,6 @@
 
 .EventTimeline-item--group {
   fill: #E8E8E8;
-}
-
-.EventTimeline-gridLine {
-  stroke-opacity: 0.2;
-  stroke: #000;
-  stroke-width: 0.5px;
-  vector-effect: non-scaling-stroke;
 }
 
 .EventTimeline-groupLabel {

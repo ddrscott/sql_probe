@@ -3,6 +3,11 @@ import '../../css/flex.css';
 import React, { Component } from 'react';
 import { TYPE_SQL } from '../../services/ProbeEvents';
 
+const EMPTY = { totalDuration: 0.0, sortedItems: [] };
+const FILTERS = new Map([
+  ['greater2ms', '> 2ms'],
+  ['greater1count', '> 1 count']
+]);
 const compareVisibleDuration = (a, b) => b.visibleDuration - a.visibleDuration;
 const round = num => ((num * 100.0) | 0) / 100.0;
 
@@ -23,20 +28,17 @@ class Aggregate {
     this.visibleDuration = sumVisibleDuration(items);
   }
 
-  addItem(item) {
+  add(item) {
     this.items.push(item);
     this.visibleDuration += item.visibleDuration;
   }
 }
 
-
-const MAX_SQL_STATEMENTS = 5;
-const EMPTY = { totalDuration: 0.0, sortedItems: [] };
-const bySql = (visibleItems=[]) => {
+const aggregateBySql = (visibleItems, filters) => {
   if (visibleItems.length === 0) return EMPTY;
 
   let totalDuration = 0.0;
-  const items = [];
+  const aggs = [];
   const sqlToEvent = new Map();
 
   for (let i = 0; i < visibleItems.length; ++i) {
@@ -47,23 +49,23 @@ const bySql = (visibleItems=[]) => {
       const { event: { sql, sqlHash } } = item;
 
       if (sqlToEvent.has(sqlHash)) {
-        sqlToEvent.get(sqlHash).addItem(item);
+        sqlToEvent.get(sqlHash).add(item);
       }
       else {
         const agg = new Aggregate(sql, [ item ], item.event.color, sqlHash);
-        items.push(agg);
+        aggs.push(agg);
         sqlToEvent.set(sqlHash, agg);
       }
     }
   };
 
-  const sortedItems = items.sort(compareVisibleDuration);
-  if (sortedItems.length <= MAX_SQL_STATEMENTS) return { totalDuration, sortedItems };
-
-  const otherAggs = sortedItems.slice(MAX_SQL_STATEMENTS);
-  const otherAgg = new Aggregate('Other', otherAggs);
-
-  return { totalDuration, sortedItems: sortedItems.slice(0, MAX_SQL_STATEMENTS).concat(otherAgg) };
+  const sortedItems = (
+    aggs
+      .filter(agg => !filters.has('greater2ms') || agg.visibleDuration > 2.0)
+      .filter(agg => !filters.has('greater1count') || agg.items.length > 1)
+      .sort(compareVisibleDuration)
+  );
+  return { totalDuration, sortedItems };
 }
 
 class Row extends Component {
@@ -198,43 +200,84 @@ const renderRow = ({ aggOrItem, depth, key, onHoverSql, parentDuration }) => {
   );
 }
 
+const FilterControls = ({ filters, onFilterChange }) => (
+  <div className='SummaryTab-controlBar flex flex--row flex-content-center'>
+    <span className='SummaryTab-controlLabel'>
+      Filters
+    </span>
+    {[...FILTERS].map(([name, label], i) =>
+      <span key={i} className='SummaryTab-control'>
+        <input
+          type='checkbox'
+          checked={filters.has(name)}
+          onChange={onFilterChange}
+          data-filter={name}
+        /> {label}
+      </span>
+    )}
+  </div>
+);
+
+const TableHeader = () => (
+  <div className='SummaryTab-row SummaryTab-row--header'>
+    <div className='SummaryTab-cell SummaryTab-cell--duration'>
+      Time
+    </div>
+    <div className='SummaryTab-cell SummaryTab-cell--count'>
+      Count
+    </div>
+    <div className='SummaryTab-cell SummaryTab-cell--label'>
+      SQL
+    </div>
+  </div>
+);
+
+const Table = ({ onHoverSql, visibleEvents, filters }) => {
+  const { totalDuration, sortedItems } = aggregateBySql(visibleEvents, filters);
+  return (
+    <div className='SummaryTab-rowContainer flex-grow'>
+      {sortedItems.map((agg, i) =>
+        renderRow({
+          key: i,
+          aggOrItem: agg,
+          parentDuration: totalDuration,
+          onHoverSql: onHoverSql,
+          depth: 0
+        })
+      )}
+    </div>
+  )
+};
+
 export default class extends Component {
-  shouldComponentUpdate({ visibleEvents, hoveredSql, onHoverSql }){
-    const { props } = this;
+  state = {
+    filters: new Set(FILTERS.keys())
+  }
+
+  onFilterChange = ({ target: { dataset: { filter } }}) => {
+    const { filters } = this.state;
+    filters[filters.has(filter) ? 'delete' : 'add'](filter);
+    this.setState({ filters: new Set(filters) });
+  }
+
+  shouldComponentUpdate({ visibleEvents, hoveredSql, onHoverSql }, { filters }){
+    const { props, state } = this;
     return (
       visibleEvents !== props.visibleEvents
       || hoveredSql !== props.hoveredSql
       || onHoverSql !== props.onHoverSql
+      || filters !== state.filters
     )
   }
 
   render() {
+    const { filters } = this.state;
     const { visibleEvents, hoveredSql, onHoverSql } = this.props;
-    const { totalDuration, sortedItems } = bySql(visibleEvents);
     return (
       <div className='SummaryTab flex'>
-        <div className='SummaryTab-row SummaryTab-row--header'>
-          <div className='SummaryTab-cell SummaryTab-cell--duration'>
-            Time
-          </div>
-          <div className='SummaryTab-cell SummaryTab-cell--count'>
-            Count
-          </div>
-          <div className='SummaryTab-cell SummaryTab-cell--label'>
-            SQL
-          </div>
-        </div>
-        <div className='SummaryTab-rowContainer flex-grow'>
-          {sortedItems.map((agg, i) =>
-            renderRow({
-              key: i,
-              aggOrItem: agg,
-              parentDuration: totalDuration,
-              onHoverSql: onHoverSql,
-              depth: 0
-            })
-          )}
-        </div>
+        <FilterControls filters={filters} onFilterChange={this.onFilterChange} />
+        <TableHeader />
+        <Table onHoverSql={onHoverSql} visibleEvents={visibleEvents} filters={filters} />
         {hoveredSql &&
           <style>{`
             .SummaryTab-row:not([data-hoverkey='${hoveredSql}']):not(.SummaryTab-row--header) {

@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './App.css';
 import EventDetails from './components/EventDetails';
 import EventsSummary from './components/EventsSummary/EventsSummary';
-import EventTimeline from './components/EventTimeline';
+import EventTimeline from './components/EventTimeline/EventTimeline';
 import PanelSplit from './components/PanelSplit';
 
 export default class App extends Component {

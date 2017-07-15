@@ -16,7 +16,7 @@
 
 .SummaryTab-row--header:hover,
 .SummaryTab-row--header {
-  background: #EEE;
+  background-color: #EEE;
   border-bottom: 1px solid #BBB;
   line-height: 1.5;
   min-height: 21px;
@@ -108,4 +108,19 @@
   min-width: 16px;
   background-color: currentColor;
   border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.SummaryTab-controlBar {
+   background-color: #EEE;
+  min-height: 24px;
+  height: 24px;
+}
+
+.SummaryTab-control {
+  padding: 0 4px;
+}
+
+.SummaryTab-controlLabel {
+  padding: 0 0 0 4px;
+  color: #888;
 }
