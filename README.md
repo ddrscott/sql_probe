@@ -16,7 +16,7 @@ in your Rails application.
 
 ```ruby
 class ApplicationController < ActionController::Base 
-  include SqlProbe::Listener
+  include SqlProbe::RequestListener
 end
 ```
 
