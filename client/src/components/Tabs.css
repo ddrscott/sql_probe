@@ -1,5 +1,5 @@
 .Tabs {
-  height: 30px;
+  height: 26px;
   margin: 0;
   padding: 0 20px;
   background-color: #EEE;
@@ -33,9 +33,9 @@
 .Tabs-tab.is-selected:before {
   content: '';
   position: absolute;
-  bottom: -8px;
+  bottom: -6px;
   left: 0;
   right: 0;
-  background: #888;
+  background: #0088ff;
   height: 2px;
 }

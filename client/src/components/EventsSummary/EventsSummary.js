@@ -1,4 +1,5 @@
 import '../../css/flex.css';
+import './EventsSummary.css';
 import React, { Component } from 'react';
 import Tabs from '../Tabs';
 import SummaryTab from './SummaryTab';
@@ -6,16 +7,13 @@ import PivotTab from './PivotTab';
 
 const TABS = [ 'Summary', 'Pivot' ];
 
-export default class extends Component {
+export default class EventsSummary extends Component {
   constructor() {
     super();
-    this.handleTabSelect = this.handleTabSelect.bind(this);
     this.state = { currentTab: TABS[0] };
   }
 
-  handleTabSelect(currentTab) {
-    this.setState({ currentTab });
-  }
+  onTabSelect = currentTab => this.setState({ currentTab })
 
   renderCurrentTab() {
     switch(this.state.currentTab) {
@@ -27,9 +25,15 @@ export default class extends Component {
 
   render() {
     return (
-      <div className='flex'>
-        <Tabs tabs={TABS} currentTab={ this.state.currentTab } onSelect={this.handleTabSelect} />
-        {this.renderCurrentTab()}
+      <div className='EventsSummary flex'>
+        <Tabs
+          tabs={TABS}
+          currentTab={this.state.currentTab}
+          onSelect={this.onTabSelect}
+        />
+        <div className='EventsSummary-tabContents flex-grow'>
+          {this.renderCurrentTab()}
+        </div>
       </div>
     );
   }

@@ -12,7 +12,7 @@ const getMode = call => {
   return ext === 'erb' ? 'application/x-erb' : 'ruby';
 };
 
-export default class extends Component {
+export default class Code extends Component {
   constructor({ path }) {
     super();
     this.fetchCode(path);
@@ -29,24 +29,30 @@ export default class extends Component {
   async fetchCode(path){
     const response = await fetch(`/sql_probe/event/code?locator=${path}`);
     const { code } = await response.json();
-    this.setState({ code }, () => {
-      requestAnimationFrame(() => this.scrollToLine(getLine(path) - 1));
-    });
+    this.setState({ code });
   }
 
-  scrollToLine(line) {
-    const { comp: { codeMirror } } = this;
-    codeMirror.setSelection({ line, ch: 0 }, { line, ch: 100000 });
-    const { offsetHeight, scrollTop } = codeMirror.getScrollerElement();
-    codeMirror.scrollTo(null, scrollTop + (offsetHeight / 2));
+  scrollToLine = () => {
+    const { comp: { codeMirror }, props: { path } } = this;
+    const line = getLine(path) - 1;
+
+    codeMirror.setSelection({ line, ch: 0 }, { line });
+    codeMirror.scrollIntoView({ line }, codeMirror.getScrollerElement().offsetHeight / 2);
     codeMirror.focus();
+  }
+
+  mountCode = comp => {
+    this.comp = comp;
+    if (comp) {
+      comp.codeMirror.on('change', this.scrollToLine);
+    }
   }
 
   render() {
     const { props: { path, className }, state: { code } } = this;
     return (
       <CodeMirror
-        ref={comp => this.comp = comp}
+        ref={this.mountCode}
         className={`Code ${className || ''}`}
         options={{
           lineNumbers: true,

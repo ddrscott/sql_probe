@@ -5,11 +5,9 @@ import { DraggableCore } from 'react-draggable';
 const renderPanel = (p, size) =>
   typeof p === 'function' ? p(size) : p;
 
-export default class extends Component {
+export default class PanelSplit extends Component {
   constructor({ initialSize = 300 }){
     super();
-    this.handleDragStart = this.handleDragStart.bind(this);
-    this.handleDrag = this.handleDrag.bind(this);
     this.state = {
       size: initialSize,
       startDragPos: 0,
@@ -22,14 +20,14 @@ export default class extends Component {
   get sizeAttr() { return this.isVertical ? 'height' : 'width' }
   get eventAttr() { return this.isVertical ? 'screenY' : 'screenX' }
 
-  handleDragStart({ [this.eventAttr]: pos }) {
+  handleDragStart = ({ [this.eventAttr]: pos }) => {
     this.setState({
       startDragPos: pos,
       startDragSize: this.state.size
     })
   }
 
-  handleDrag({ [this.eventAttr]: pos }) {
+  handleDrag = ({ [this.eventAttr]: pos }) => {
     const { startDragSize, startDragPos } = this.state;
     const size = startDragSize - startDragPos + pos;
     this.setState({ size });

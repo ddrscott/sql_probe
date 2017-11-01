@@ -1,0 +1,126 @@
+.SummaryTab {
+  font-size: 11px;
+  height: 100%;
+  overflow: hidden;
+  position: absolute;
+  transform: translateZ(0);
+  width: 100%;
+}
+
+.SummaryTab-row {
+  display: flex;
+  line-height: 2.5;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.SummaryTab-row--header:hover,
+.SummaryTab-row--header {
+  background-color: #EEE;
+  border-bottom: 1px solid #BBB;
+  line-height: 1.5;
+  min-height: 21px;
+}
+
+.SummaryTab-row--header .SummaryTab-cell {
+  padding-top: 4px;
+}
+
+.SummaryTab-rowContainer {
+  overflow: auto;
+}
+
+.SummaryTab-cell {
+  border-right: 1px solid #BBB;
+  overflow: hidden;
+  padding: 0 6px;
+  position: relative;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.SummaryTab-cell:last-child {
+  border-right: none;
+}
+
+.SummaryTab-cell--count,
+.SummaryTab-cell--duration {
+  text-align: right;
+}
+
+.SummaryTab-cell--count {
+  min-width: 7ch;
+}
+
+.SummaryTab-cell--duration {
+  min-width: 20ch;
+}
+
+.SummaryTab-cell--durationPct {
+  min-width: 8ch;
+  color: #888;
+}
+
+.SummaryTab-cell--label {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.SummaryTab-cellPct {
+  background: rgba(255, 180, 0, 0.5);
+  border-bottom: 1px solid rgb(255, 180, 0);
+  bottom: 2px;
+  left: 0;
+  opacity: 0.5;
+  overflow: hidden;
+  position: absolute;
+  right: 0;
+  top: 2px;
+  transform-origin: top right;
+  z-index: 0;
+}
+
+.SummaryTab-cellExpander {
+  min-width: 6px;
+  height: 16px;
+  margin: 0 8px 0 2px;
+  position: relative;
+}
+
+.SummaryTab-cellExpander--expandable:before {
+  position: absolute;
+  content: '';
+  left: 0;
+  top: 2px;
+  border: 6px solid transparent;
+  border-left-color: #555;
+  border-left-width: 8px;
+  transition: transform 1s ease-in;
+}
+
+.SummaryTab-cellExpander--expandable.is-expanded {
+  transform: rotate(90deg);
+}
+
+.SummaryTab-cellBox {
+  margin-right: 6px;
+  height: 16px;
+  min-width: 16px;
+  background-color: currentColor;
+  border: 1px solid rgba(0, 0, 0, 0.3);
+}
+
+.SummaryTab-controlBar {
+   background-color: #EEE;
+  min-height: 24px;
+  height: 24px;
+}
+
+.SummaryTab-control {
+  padding: 0 4px;
+}
+
+.SummaryTab-controlLabel {
+  padding: 0 0 0 4px;
+  color: #888;
+}

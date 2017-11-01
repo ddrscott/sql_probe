@@ -1,0 +1,6 @@
+.GridLine {
+  stroke-opacity: 0.2;
+  stroke: #000;
+  stroke-width: 0.5px;
+  vector-effect: non-scaling-stroke;
+}
